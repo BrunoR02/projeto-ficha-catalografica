@@ -102,15 +102,15 @@ export default function FichaForm(){
     console.log("Submit:")
     console.log(formInput)
 
-    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={criaFichaCatalografica(formInput)} />).toBlob()
     
     // let pdfBuffer = await ReactPDF.renderToBuffer(<FichaDocument />);
-
+    
+    if(validateForm()){
+      console.log("Enviou")
+    } else return
+    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={criaFichaCatalografica(formInput)} />).toBlob()
     exportToPdf(pdfBuffer)
     
-    // if(validateForm()){
-      //   console.log("Enviou")
-      // } else return
   }
 
 
