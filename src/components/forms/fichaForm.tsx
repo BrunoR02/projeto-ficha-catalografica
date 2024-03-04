@@ -88,7 +88,7 @@ export default function FichaForm(){
   }
   
   function addPontoAssunto(){
-    if(pontoAssunto.length==0 || formInput.assuntosSecundario.some(item=>item==pontoAssunto)){
+    if(pontoAssunto.trim().length==0 || formInput.assuntosSecundario.some(item=>item==pontoAssunto)){
       return
     }
     formIsInvalid["assuntosSecundario"] = false
@@ -125,22 +125,22 @@ export default function FichaForm(){
       return false
     }
 
-    if(formInput.titulo.length==0){
+    if(formInput.titulo.trim().length==0){
       setFormIsInvalid(obj=>({...obj,titulo:true}))
       return false
     }
     
-    if(formInput.dataPub.length!==4){
+    if(formInput.dataPub.trim().length!==4){
       setFormIsInvalid(obj=>({...obj,dataPub:true}))
       return false
     }
     
-    if(formInput.local.length==0){
+    if(formInput.local.trim().length==0){
       setFormIsInvalid(obj=>({...obj,local:true}))
       return false
     }
 
-    if(formInput.nomeEditora.length==0){
+    if(formInput.nomeEditora.trim().length==0){
       setFormIsInvalid(obj=>({...obj,nomeEditora:true}))
       return false
     }
@@ -161,7 +161,7 @@ export default function FichaForm(){
     }
     
     //Fazer validacao com padrao CDD CDU se existir.
-    if(formInput.cdd.length==0 && formInput.cdu.length==0){
+    if(formInput.cdd.trim().length==0 && formInput.cdu.trim().length==0){
       setFormIsInvalid(obj=>({...obj,cdd:true}))
       return false
     }
@@ -194,7 +194,7 @@ export default function FichaForm(){
           <input 
             name="responsabilidades" 
             value={respName} 
-            onChange={(e)=>setRespName(e.target.value.trim())}
+            onChange={(e)=>setRespName(e.target.value)}
             onKeyDown={(e)=>{if(e.key=="Enter") addRespName();return textFilter(e)}}
             className="block w-full mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6" type="text"/>
           <span onClick={addRespName} 
@@ -221,7 +221,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="titulo">Título <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={textFilter}
@@ -233,7 +233,7 @@ export default function FichaForm(){
         {/* subtitulo obra */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="subtitulo">Subtítulo</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
           name="subtitulo"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -242,7 +242,7 @@ export default function FichaForm(){
         {/* Nome do tradutor */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="tradutor">Tradução</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
           name="tradutor"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -265,7 +265,7 @@ export default function FichaForm(){
         {/* Informações sobre edicao abreviado */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="edicaoObs">Informações sobre edição</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
           name="edicaoObs" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -274,7 +274,7 @@ export default function FichaForm(){
         {/* Data da publicacao */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="dataPub">Data da publicação <span className="text-red-700">*</span></label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>numberFilter(e,4)}
           name="dataPub" 
           placeholder="Ex.: 2024"
@@ -286,7 +286,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="local">Local da publicação <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
@@ -299,7 +299,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nomeEditora">Nome da editora <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={textFilter}
@@ -312,7 +312,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="numPag">Núm. de páginas <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>numberFilter(e,4)}
@@ -398,7 +398,7 @@ export default function FichaForm(){
         {/* Nome da série(se existir do livro) */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nomeSerie">Nome da série</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
           name="nomeSerie" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -429,7 +429,7 @@ export default function FichaForm(){
         {/* Nota sobre livro 1 */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nota1">Nota 1</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
           name="nota1" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -438,7 +438,7 @@ export default function FichaForm(){
         {/* Nota sobre livro 2 */}
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nota2">Nota 2</label>
         <input 
-          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}))}
+          onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
           name="nota2" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -450,7 +450,7 @@ export default function FichaForm(){
           <input 
             name="assuntosSecundario" 
             value={pontoAssunto} 
-            onChange={(e)=>setPontoAssunto(e.target.value.trim())}
+            onChange={(e)=>setPontoAssunto(e.target.value)}
             onKeyDown={(e)=>{if(e.key=="Enter") addPontoAssunto();return textFilter(e)}}
             className="block w-full mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           <span onClick={addPontoAssunto} 
@@ -474,7 +474,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="cdd">CDD <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             formIsInvalid["cdd"] = false
           }}
           onKeyDown={(e)=>textFilter(e,"cdd")}
@@ -488,7 +488,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="cdu">CDU <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value.trim()}));
+            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             formIsInvalid["cdd"] = false
           }}
           onKeyDown={(e)=>textFilter(e,"cdd")}
