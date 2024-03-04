@@ -9,16 +9,16 @@ export default function FichaForm(){
   const [respName,setRespName] = useState<string>("")
   const [pontoAssunto,setPontoAssunto] = useState<string>("")
   const [formInput,setFormInput] = useState<FichaForm>({
-    responsabilidades:["Bruno Lucas","Beijamin Arrola","Sapo Kururu"],
-    titulo:"A divina",
+    responsabilidades:[],
+    titulo:"",
     subtitulo:"",
     tradutor:"",
     edicao: 1,
     edicaoObs:"",
-    dataPub:"2024",
-    local:"Aracaju, SE",
-    nomeEditora:"Yuukan Editora",
-    numPag:250,
+    dataPub:"",
+    local:"",
+    nomeEditora:"",
+    numPag:0,
     dimensoes:{
       width:0,
       height:0
@@ -27,11 +27,11 @@ export default function FichaForm(){
     temCor:false,
     nomeSerie:"",
     numSerie:0,
-    isbn:1234567891,
+    isbn:0,
     nota1:"",
     nota2:"",
-    assuntosSecundario:["religioso"],
-    cdd:"382",
+    assuntosSecundario:[],
+    cdd:"",
     cdu:""
   })
   const [formIsInvalid,setFormIsInvalid] = useState({
