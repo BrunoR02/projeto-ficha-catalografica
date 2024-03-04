@@ -1,9 +1,16 @@
-export function criaFichaCatalografica(ficha:FichaForm){
+export function criaFichaCatalografica(ficha:FichaForm):Ficha{
+  let fichaObj:Ficha = {
+    linha1:"",
+    linha2:"",
+    linha3:"",
+    linha4:"",
+    linha5:"",
+  }
   //Formata textos para criar ficha
   let responsabilidades = ficha.responsabilidades.map(name=>formatText(name,"name"))
   let titulo = formatText(ficha.titulo)
   let subtitulo = formatText(ficha.subtitulo)
-  let tradutor = formatText(ficha.tradutor)
+  let tradutor = formatText(ficha.tradutor,"name")
   let local = formatText(ficha.local,"name")
   let nomeEditora = formatText(ficha.nomeEditora,"name")
   let assuntosSecundario = ficha.assuntosSecundario.map(assunto=>formatText(assunto))
@@ -16,28 +23,34 @@ export function criaFichaCatalografica(ficha:FichaForm){
     line1 = `${responsabilidades[0].split(" ").slice(-1)[0]}, ${responsabilidades[0].split(" ").slice(0,-1).join(" ")}.\n`
   }
 
-  fichaTextArray.push(line1)
+  fichaObj.linha1 = line1
+  // fichaTextArray.push(line1)
   
-  let line2 = `    ${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${responsabilidades.join(", ")}${tradutor.length>0?` ; Tradução de ${tradutor}`:""}. ${ficha.edicao!==0?`Ed. ${ficha.edicao}${ficha.edicaoObs.length>0?`, ${ficha.edicaoObs}`:""}. `:""}- ${local}: ${nomeEditora}, ${ficha.dataPub}.`
+  let line2 = `${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${responsabilidades.join(", ")}${tradutor.length>0?` ; Tradução de ${tradutor}`:""}. ${ficha.edicao!==0?`Ed. ${ficha.edicao}${ficha.edicaoObs.length>0?`, ${ficha.edicaoObs}`:""}. `:""}- ${local}: ${nomeEditora}, ${ficha.dataPub}.`
+  
+  fichaObj.linha2 = line2
+  // fichaTextArray.push(line2)
 
-  fichaTextArray.push(line2)
+  let line3 = `Nº ${ficha.numPag}p. : ${ficha.temIlustracao?"il. ":""}${ficha.temCor?"cor. ":""}${ficha.dimensoes.height>0&&ficha.dimensoes.width>0?`${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `:""}${ficha.nomeSerie.length>0?`(${ficha.nomeSerie}${ficha.numSerie!==0?`; ${ficha.numSerie}`:""})`:""}`
 
-  let line3 = `    Nº ${ficha.numPag}p. : ${ficha.temIlustracao?"il. ":""}${ficha.temCor?"cor. ":""}${ficha.dimensoes.height>0&&ficha.dimensoes.width>0?`${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `:""}${ficha.nomeSerie.length>0?`(${ficha.nomeSerie}${ficha.numSerie!==0?`; ${ficha.numSerie}`:""})`:""}`
-
-  fichaTextArray.push(line3)
+  fichaObj.linha3 = line3
+  // fichaTextArray.push(line3)
 
   if(ficha.nota1.length>0){
-    let lineNota = `    ${ficha.nota1}`
-    fichaTextArray.push(lineNota)
+    let lineNota = `${ficha.nota1}`
+    fichaObj.linhaNota1 = lineNota
+    // fichaTextArray.push(lineNota)
   }
   if(ficha.nota2.length>0){
-    let lineNota = `    ${ficha.nota2}`
-    fichaTextArray.push(lineNota)
+    let lineNota = `${ficha.nota2}`
+    fichaObj.linhaNota2 = lineNota
+    // fichaTextArray.push(lineNota)
   }
 
-  let line4 = `    ISBN ${ficha.isbn}\n`
+  let line4 = `ISBN ${ficha.isbn}\n`
 
-  fichaTextArray.push(line4)
+  fichaObj.linha4 = line4
+  // fichaTextArray.push(line4)
 
   let textAssuntosSecundario = `1. ${assuntosSecundario[0]}. `
   if(assuntosSecundario.length>1){
@@ -55,25 +68,27 @@ export function criaFichaCatalografica(ficha:FichaForm){
 
   let line5EndText = `${intToRoman(responsabilidades.length+1)}. Título. ${intToRoman(responsabilidades.length+2)}. Série.`
 
-  let line5 = `    ${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
+  let line5 = `${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
 
-  fichaTextArray.push(line5)
+  fichaObj.linha5 = line5
+  // fichaTextArray.push(line5)
 
   if(ficha.cdu.length>0){
-    let lineCDU = `        CDU ${ficha.cdu}`
-    fichaTextArray.push(lineCDU)
+    let lineCDU = `CDU ${ficha.cdu}`
+    fichaObj.linhaCDU = lineCDU
+    // fichaTextArray.push(lineCDU)
   }
 
   if(ficha.cdd.length>0){
-    let lineCDD = `        CDD ${ficha.cdd}`
-    fichaTextArray.push(lineCDD)
+    let lineCDD = `CDD ${ficha.cdd}`
+    fichaObj.linhaCDD = lineCDD
+    // fichaTextArray.push(lineCDD)
   }
 
+  // let fichaText = fichaTextArray.join("\n")
+  // exportToTxt(fichaText)
 
-  let fichaText = fichaTextArray.join("\n")
-  exportToTxt(fichaText)
-
-  return fichaText
+  return fichaObj
 }
 
 function exportToTxt(text:string){
@@ -84,6 +99,17 @@ function exportToTxt(text:string){
   document.body.appendChild(element); // Required for this to work in FireFox
   element.click();
   document.body.removeChild(element)
+}
+
+export function exportToPdf(blob:Blob){
+  // let blob = new Blob([buffer], {type: "application/pdf"});
+  let link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  let fileName = "example.pdf";
+  link.download = fileName;
+  document.body.appendChild(link); // Required for this to work in FireFox
+  link.click();
+  document.body.removeChild(link)
 }
 
 function intToRoman(integer:number):string {
@@ -149,4 +175,16 @@ export interface FichaForm{
   assuntosSecundario:string[],
   cdd:string,
   cdu:string
+}
+
+export interface Ficha{
+  linha1:string
+  linha2:string
+  linha3:string
+  linhaNota1?:string
+  linhaNota2?:string
+  linha4:string
+  linha5:string
+  linhaCDD?:string
+  linhaCDU?:string
 }

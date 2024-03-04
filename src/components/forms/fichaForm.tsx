@@ -1,22 +1,24 @@
 'use client'
 import { ChangeEvent, FormEvent, MouseEventHandler, useEffect, useState } from "react"
 import ErrorMessage from "../texts/errorMessage"
-import { FichaForm, criaFichaCatalografica } from "@/utils/Utils"
+import { FichaForm, criaFichaCatalografica, exportToPdf } from "@/utils/Utils"
+import ReactPDF from "@react-pdf/renderer"
+import FichaDocument from "../documents/fichaDocument"
 
 export default function FichaForm(){
   const [respName,setRespName] = useState<string>("")
   const [pontoAssunto,setPontoAssunto] = useState<string>("")
   const [formInput,setFormInput] = useState<FichaForm>({
-    responsabilidades:[],
-    titulo:"",
+    responsabilidades:["Bruno Lucas","Beijamin Arrola","Sapo Kururu"],
+    titulo:"A divina",
     subtitulo:"",
     tradutor:"",
     edicao: 1,
     edicaoObs:"",
-    dataPub:"",
-    local:"",
-    nomeEditora:"",
-    numPag:0,
+    dataPub:"2024",
+    local:"Aracaju, SE",
+    nomeEditora:"Yuukan Editora",
+    numPag:250,
     dimensoes:{
       width:0,
       height:0
@@ -25,11 +27,11 @@ export default function FichaForm(){
     temCor:false,
     nomeSerie:"",
     numSerie:0,
-    isbn:0,
+    isbn:1234567891,
     nota1:"",
     nota2:"",
-    assuntosSecundario:[],
-    cdd:"",
+    assuntosSecundario:["religioso"],
+    cdd:"382",
     cdu:""
   })
   const [formIsInvalid,setFormIsInvalid] = useState({
@@ -96,14 +98,19 @@ export default function FichaForm(){
     setPontoAssunto("")
   }
 
-  function handleFormSubmit(e:any){
+  async function handleFormSubmit(e:any){
     console.log("Submit:")
     console.log(formInput)
 
-    if(validateForm()){
-      console.log("Enviou")
-    } else return
-    criaFichaCatalografica(formInput)
+    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={criaFichaCatalografica(formInput)} />).toBlob()
+    
+    // let pdfBuffer = await ReactPDF.renderToBuffer(<FichaDocument />);
+
+    exportToPdf(pdfBuffer)
+    
+    // if(validateForm()){
+      //   console.log("Enviou")
+      // } else return
   }
 
 
@@ -225,6 +232,7 @@ export default function FichaForm(){
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={textFilter}
+          value={formInput.titulo}
           name="titulo" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           {formIsInvalid.titulo && <ErrorMessage message={"Insira um título válido"}/>}
@@ -235,6 +243,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
+          value={formInput.subtitulo}
           name="subtitulo"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -244,6 +253,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
+          value={formInput.tradutor}
           name="tradutor"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -258,6 +268,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:+e.target.value}))}
           onKeyDown={(e)=>numberFilter(e,3)}
+          value={formInput.edicao}
           name="edicao" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -267,6 +278,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
+          value={formInput.edicaoObs}
           name="edicaoObs" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -276,6 +288,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>numberFilter(e,4)}
+          value={formInput.dataPub}
           name="dataPub" 
           placeholder="Ex.: 2024"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -290,6 +303,7 @@ export default function FichaForm(){
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
+          value={formInput.local}
           name="local" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           {formIsInvalid.local && <ErrorMessage message={"Insira um local"}/>}
@@ -303,6 +317,7 @@ export default function FichaForm(){
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={textFilter}
+          value={formInput.nomeEditora}
           name="nomeEditora" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           {formIsInvalid.nomeEditora && <ErrorMessage message={"Insira um nome de editora válido"}/>}
@@ -316,6 +331,7 @@ export default function FichaForm(){
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>numberFilter(e,4)}
+          value={formInput.numPag}
           name="numPag" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           
@@ -330,6 +346,7 @@ export default function FichaForm(){
             <input 
               onChange={(e)=>setFormInput(obj=>({...obj,dimensoes:{...obj.dimensoes,width:+e.target.value}}))}
               onKeyDown={(e)=>numberFilter(e,2)}
+              value={formInput.dimensoes.width}
               name="dimW" 
               className="block w-7/12 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0 sm:text-sm sm:leading-6"/>
             <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">cm</span>
@@ -339,6 +356,7 @@ export default function FichaForm(){
             <input 
               onChange={(e)=>setFormInput(obj=>({...obj,dimensoes:{...obj.dimensoes,height:+e.target.value}}))}
               onKeyDown={(e)=>numberFilter(e,2)}
+              value={formInput.dimensoes.height}
               name="dimH"
               className="block w-7/12 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 outline-none focus:ring-0 sm:text-sm sm:leading-6"/>
             <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">cm</span>
@@ -400,6 +418,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={textFilter}
+          value={formInput.nomeSerie}
           name="nomeSerie" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -409,6 +428,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:+e.target.value}))}
           onKeyDown={(e)=>numberFilter(e,3)}
+          value={formInput.numSerie}
           name="numSerie" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -421,6 +441,7 @@ export default function FichaForm(){
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>numberFilter(e,13)}
+          value={formInput.isbn}
           name="isbn" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
         {formIsInvalid.isbn && <ErrorMessage message={"Insira um número de ISBN válido"}/>}
@@ -431,6 +452,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
+          value={formInput.nota1}
           name="nota1" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -440,6 +462,7 @@ export default function FichaForm(){
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
+          value={formInput.nota2}
           name="nota2" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
@@ -478,6 +501,7 @@ export default function FichaForm(){
             formIsInvalid["cdd"] = false
           }}
           onKeyDown={(e)=>textFilter(e,"cdd")}
+          value={formInput.cdd}
           name="cdd" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           {formIsInvalid.cdd && <ErrorMessage message={"Insira pelo menos um dos dois códigos: CDD ou CDU"}/>}
@@ -492,6 +516,7 @@ export default function FichaForm(){
             formIsInvalid["cdd"] = false
           }}
           onKeyDown={(e)=>textFilter(e,"cdd")}
+          value={formInput.cdu}
           name="cdu" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
       </div>
