@@ -1,7 +1,7 @@
 'use client'
 import { ChangeEvent, FormEvent, MouseEventHandler, useEffect, useState } from "react"
 import ErrorMessage from "../texts/errorMessage"
-import { FichaForm, criaFichaCatalografica, exportToDocx, exportToPdf } from "@/utils/Utils"
+import { FichaForm, criaFichaCatalografica, exportToDocx, exportToPdf, formatText } from "@/utils/Utils"
 import ReactPDF from "@react-pdf/renderer"
 import FichaDocument from "../documents/fichaDocument"
 
@@ -110,7 +110,7 @@ export default function FichaForm(){
       console.log("Enviou")
     } else return
     let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={criaFichaCatalografica(formInput)} />).toBlob()
-    exportToPdf(pdfBuffer)
+    exportToPdf(pdfBuffer,formatText(formInput.titulo))
     
   }
 
@@ -328,7 +328,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="numPag">Núm. de páginas <span className="text-red-700">*</span></label>
         <input 
           onChange={(e)=>{
-            setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
+            setFormInput(obj=>({...obj,[e.target.name]:+e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
           onKeyDown={(e)=>numberFilter(e,4)}

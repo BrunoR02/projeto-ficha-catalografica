@@ -9,10 +9,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     display:"flex",
     justifyContent:"center",
-    alignItems:"flex-start"
+    alignItems:"flex-end",
   },
   section: {
     margin: 10,
+    marginBottom:100,
     padding: 10,
     width:283,
     border: "1px solid black"

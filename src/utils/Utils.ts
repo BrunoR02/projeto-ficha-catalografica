@@ -20,20 +20,17 @@ export function criaFichaCatalografica(ficha:FichaForm):Ficha{
   //Cria texto da ficha para ser convertido em pdf ou word.
   let fichaTextArray = []
 
-  let line1 = `${responsabilidades[0]}.`
-  if(responsabilidades[0].split(" ").length>1){
-    line1 = `${responsabilidades[0].split(" ").slice(-1)[0]}, ${responsabilidades[0].split(" ").slice(0,-1).join(" ")}.\n`
-  }
+  let line1 = `${convertNameToEntidade(responsabilidades[0])}.\n`
 
   fichaObj.linha1 = line1
   // fichaTextArray.push(line1)
   
-  let line2 = `${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${responsabilidades.join(", ")}${tradutor.length>0?` ; Tradução de ${tradutor}`:""}. ${ficha.edicao!==0?`Ed. ${ficha.edicao}${ficha.edicaoObs.length>0?`, ${ficha.edicaoObs}`:""}. `:""}- ${local}: ${nomeEditora}, ${ficha.dataPub}.`
+  let line2 = `${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${responsabilidades.join(", ")}${tradutor.length>0?` ; Tradução de ${tradutor}`:""}. ${ficha.edicao!==0?`${ficha.edicao}. ed.${ficha.edicaoObs.length>0?`, ${ficha.edicaoObs}.`:""} `:""}${local}: ${nomeEditora}, ${ficha.dataPub}.`
   
   fichaObj.linha2 = line2
   // fichaTextArray.push(line2)
 
-  let line3 = `Nº ${ficha.numPag}p. : ${ficha.temIlustracao?"il. ":""}${ficha.temCor?"cor. ":""}${ficha.dimensoes.height>0&&ficha.dimensoes.width>0?`${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `:""}${ficha.nomeSerie.length>0?`(${ficha.nomeSerie}${ficha.numSerie!==0?`; ${ficha.numSerie}`:""})`:""}`
+  let line3 = `${ficha.numPag} p.${ficha.temIlustracao||ficha.temCor||ficha.dimensoes.width>0||ficha.dimensoes.height>0||ficha.nomeSerie.length>0?" : ":""}${ficha.temIlustracao?"il. ":""}${ficha.temCor?"cor. ":""}${ficha.dimensoes.height>0&&ficha.dimensoes.width>0?`${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `:""}${ficha.nomeSerie.length>0?`(${ficha.nomeSerie}${ficha.numSerie!==0?`; ${ficha.numSerie}`:""})`:""}`
 
   fichaObj.linha3 = line3
   // fichaTextArray.push(line3)
@@ -61,10 +58,10 @@ export function criaFichaCatalografica(ficha:FichaForm):Ficha{
     }
   } 
 
-  let responsabilidadesExtenso = `I. ${responsabilidades[0].split(" ").slice(-1)[0]}, ${responsabilidades[0].split(" ").slice(0,-1).join(" ")}. `
+  let responsabilidadesExtenso = `I. ${convertNameToEntidade(responsabilidades[0])}. `
   if(responsabilidades.length>1){
     for(let x=1;x<responsabilidades.length;x++){
-      responsabilidadesExtenso +=`${intToRoman(x+1)}. ${responsabilidades[x].split(" ").slice(-1)[0]}, ${responsabilidades[x].split(" ").slice(0,-1).join(" ")}. `
+      responsabilidadesExtenso +=`${intToRoman(x+1)}. ${convertNameToEntidade(responsabilidades[x])}. `
     }
   }
 
@@ -103,11 +100,11 @@ function exportToTxt(text:string){
   document.body.removeChild(element)
 }
 
-export function exportToPdf(blob:Blob){
+export function exportToPdf(blob:Blob,titulo:string){
   // let blob = new Blob([buffer], {type: "application/pdf"});
   let link = document.createElement('a');
   link.href = window.URL.createObjectURL(blob);
-  let fileName = "example.pdf";
+  let fileName = `Ficha Catalográfica - ${titulo}.pdf`;
   link.download = fileName;
   document.body.appendChild(link); // Required for this to work in FireFox
   link.click();
@@ -205,7 +202,7 @@ function intToRoman(integer:number):string {
   return result;
 }
 
-function formatText(text:string,type:"name"|"normal"="normal"):string{
+export function formatText(text:string,type:"name"|"normal"="normal"):string{
   if(text.length==0) return text
 
   if(type=="name"){
@@ -215,6 +212,14 @@ function formatText(text:string,type:"name"|"normal"="normal"):string{
   } else {
     return text.split("")[0].toUpperCase() + text.split("").slice(1).join("").toLowerCase()
   }
+}
+
+function convertNameToEntidade(name:string){
+  let convertedName = `${name}`
+  if(name.split(" ").length>1){
+    convertedName = `${name.split(" ").slice(-1)[0]}, ${name.split(" ").slice(0,-1).join(" ")}`
+  }
+  return convertedName
 }
 
 export interface FichaForm{
