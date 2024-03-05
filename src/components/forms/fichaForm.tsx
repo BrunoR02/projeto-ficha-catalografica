@@ -1,7 +1,7 @@
 'use client'
 import { ChangeEvent, FormEvent, MouseEventHandler, useEffect, useState } from "react"
 import ErrorMessage from "../texts/errorMessage"
-import { FichaForm, criaFichaCatalografica, exportToPdf } from "@/utils/Utils"
+import { FichaForm, criaFichaCatalografica, exportToDocx, exportToPdf } from "@/utils/Utils"
 import ReactPDF from "@react-pdf/renderer"
 import FichaDocument from "../documents/fichaDocument"
 
@@ -102,7 +102,8 @@ export default function FichaForm(){
     console.log("Submit:")
     console.log(formInput)
 
-    
+    // exportToDocx()
+    // return
     // let pdfBuffer = await ReactPDF.renderToBuffer(<FichaDocument />);
     
     if(validateForm()){

@@ -1,3 +1,5 @@
+import { Packer,Document as Doc, Paragraph, TextRun, Tab, HeadingLevel } from "docx";
+
 export function criaFichaCatalografica(ficha:FichaForm):Ficha{
   let fichaObj:Ficha = {
     linha1:"",
@@ -110,6 +112,71 @@ export function exportToPdf(blob:Blob){
   document.body.appendChild(link); // Required for this to work in FireFox
   link.click();
   document.body.removeChild(link)
+}
+
+export function exportToDocx(){
+  const doc = new Doc({
+    sections: [
+      {
+        properties: {
+          page: {
+            margin: {
+              top: 10,
+              right: 10,
+              bottom: 10,
+              left: 1000,
+            }
+          },
+        },
+        children: [
+          new Paragraph({
+            border:{
+              top:{
+                size:2,color:"#000000",style:"single"
+              },
+              bottom:{
+                size:2,color:"#000000",style:"single"
+              },
+              left:{
+                size:2,color:"#000000",style:"single"
+              },
+              right:{
+                size:2,color:"#000000",style:"single"
+              },
+            },
+            children: [
+              new TextRun("Hello World"),
+              new TextRun({
+                text: "Foo bar",
+                bold: true,
+              }),
+              new TextRun({
+                children: [new Tab(), "Github is the best"],
+                bold: true,
+              }),
+            ],
+          }),
+          new Paragraph({
+            text: "Hello World",
+            heading: HeadingLevel.HEADING_1,
+          }),
+          new Paragraph("Foo bar"),
+          new Paragraph("Github is the best"),
+        ],
+      },
+    ],
+  });
+
+  Packer.toBlob(doc).then((buffer) => {
+    // fs.writeFileSync("My Document.docx", buffer);
+    let link = document.createElement('a');
+    link.href = window.URL.createObjectURL(buffer);
+    let fileName = "example.docx";
+    link.download = fileName;
+    document.body.appendChild(link); // Required for this to work in FireFox
+    link.click();
+    document.body.removeChild(link)
+  });
 }
 
 function intToRoman(integer:number):string {
