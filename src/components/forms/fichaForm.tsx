@@ -9,16 +9,16 @@ export default function FichaForm(){
   const [respName,setRespName] = useState<string>("")
   const [pontoAssunto,setPontoAssunto] = useState<string>("")
   const [formInput,setFormInput] = useState<FichaForm>({
-    responsabilidades:[],
-    titulo:"",
+    responsabilidades:["Bruno Lucas"],
+    titulo:"A Divina Comédia",
     subtitulo:"",
     tradutor:"",
     edicao: 1,
     edicaoObs:"",
-    dataPub:"",
-    local:"",
-    nomeEditora:"",
-    numPag:0,
+    dataPub:"2024",
+    local:"Aracaju",
+    nomeEditora:"Yuukan",
+    numPag:250,
     dimensoes:{
       width:0,
       height:0
@@ -27,11 +27,11 @@ export default function FichaForm(){
     temCor:false,
     nomeSerie:"",
     numSerie:0,
-    isbn:0,
+    isbn:1234567891,
     nota1:"",
     nota2:"",
-    assuntosSecundario:[],
-    cdd:"",
+    assuntosSecundario:["Religioso","esporte"],
+    cdd:"852",
     cdu:""
   })
   const [formIsInvalid,setFormIsInvalid] = useState({
@@ -102,7 +102,7 @@ export default function FichaForm(){
     console.log("Submit:")
     console.log(formInput)
 
-    // exportToDocx()
+    // exportToDocx(criaFichaCatalografica(formInput))
     // return
     // let pdfBuffer = await ReactPDF.renderToBuffer(<FichaDocument />);
     
