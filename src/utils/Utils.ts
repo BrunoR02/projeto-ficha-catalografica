@@ -1,6 +1,7 @@
 import { Packer,Document as Doc, Paragraph, TextRun, AlignmentType, ParagraphChild, IBorderOptions } from "docx";
+import tabelaCutter from "../../tabela-cutter/tabela-cutter.json"
 
-export function criaFichaCatalografica(ficha:FichaForm):Ficha{
+export function criaFichaCatalografica(ficha:FichaFormType,preview=false){
   let fichaObj:Ficha = {
     linha1:"",
     linha2:"",
@@ -11,78 +12,138 @@ export function criaFichaCatalografica(ficha:FichaForm):Ficha{
   //Formata textos para criar ficha
   let responsabilidades = ficha.responsabilidades.map(name=>formatText(name,"name"))
   let titulo = formatText(ficha.titulo)
+  if(preview && titulo.length==0) titulo = "{Título}"
   let subtitulo = formatText(ficha.subtitulo)
-  let tradutor = formatText(ficha.tradutor,"name")
+  if(preview && subtitulo.length==0) subtitulo = "{Subtítulo}"
+  let tradutor = `Tradução de ${formatText(ficha.tradutor,"name")}`
+  if(ficha.tradutor.length==0) tradutor = preview?"{Tradutor}":""
   let local = formatText(ficha.local,"name")
+  if(preview && local.length==0) local = "{Local}"
   let nomeEditora = formatText(ficha.nomeEditora,"name")
+  if(preview && nomeEditora.length==0) nomeEditora = "{Nome da Editora}"
+  let dataPub = ficha.dataPub
+  if(preview && dataPub.length==0) dataPub = "{Data}"
   let assuntosSecundario = ficha.assuntosSecundario.map(assunto=>formatText(assunto))
 
   //Cria texto da ficha para ser convertido em pdf ou word.
   let fichaTextArray = []
 
-  let line1 = `${convertNameToEntidade(responsabilidades[0])}.\n`
+  let firstEntidade = convertNameToEntidade(responsabilidades[0])
+  if(preview && firstEntidade.length==0) firstEntidade = "{Sobrenome}, {Nome da Principal Responsabilidade}"
+
+  let line1 = `${firstEntidade}.\n`
 
   fichaObj.linha1 = line1
   // fichaTextArray.push(line1)
+
+  let nomesExtenso = responsabilidades.join(", ")
+  if(preview && responsabilidades.length==0) nomesExtenso = "{Responsabilidades por Extenso}"
+
+  let numEdicao = `${ficha.edicao}. ed.`
+  if(ficha.edicao==0) numEdicao = preview?"{Nº ed}.":""
+  let edicaoObs = `, ${ficha.edicaoObs}.`
+  if(ficha.edicao==0 || ficha.edicaoObs.length==0) edicaoObs = preview&&ficha.edicao>0?", {Info Edição}":""
   
-  let line2 = `${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${responsabilidades.join(", ")}${tradutor.length>0?` ; Tradução de ${tradutor}`:""}. ${ficha.edicao!==0?`${ficha.edicao}. ed.${ficha.edicaoObs.length>0?`, ${ficha.edicaoObs}.`:""} `:""}${local}: ${nomeEditora}, ${ficha.dataPub}.`
+  let line2 = `${titulo}${subtitulo.length>0?`: ${subtitulo}`:""} / ${nomesExtenso}${tradutor.length>0?` ; ${tradutor}`:""}. ${numEdicao.length>0?`${numEdicao}${edicaoObs.length>0?`${edicaoObs}`:""} `:""}${local}: ${nomeEditora}, ${dataPub}.`
   
   fichaObj.linha2 = line2
   // fichaTextArray.push(line2)
 
-  let line3 = `${ficha.numPag} p.${ficha.temIlustracao||ficha.temCor||ficha.dimensoes.width>0||ficha.dimensoes.height>0||ficha.nomeSerie.length>0?" : ":""}${ficha.temIlustracao?"il. ":""}${ficha.temCor?"cor. ":""}${ficha.dimensoes.height>0&&ficha.dimensoes.width>0?`${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `:""}${ficha.nomeSerie.length>0?`(${ficha.nomeSerie}${ficha.numSerie!==0?`; ${ficha.numSerie}`:""})`:""}`
+  //Verifica se tem alguma propriedade do livro explicita
+  let temProp = ficha.temIlustracao||ficha.temCor||ficha.dimensoes.width>0||ficha.dimensoes.height>0||ficha.nomeSerie.length>0
+
+  let ilustracao = "il. "
+  if(!ficha.temIlustracao) ilustracao = preview?"{il.} ":""
+  let cor = "cor. "
+  if(!ficha.temCor) cor = preview?"{cor.} ":""
+
+  let dimensoes = ""
+  if(ficha.dimensoes.width>0 && ficha.dimensoes.height==0) dimensoes = `${ficha.dimensoes.width} cm `
+  if(ficha.dimensoes.width==0 && ficha.dimensoes.height>0) dimensoes = `${ficha.dimensoes.height} cm `
+  if(ficha.dimensoes.width>0 && ficha.dimensoes.height>0) dimensoes = `${ficha.dimensoes.width}x${ficha.dimensoes.height} cm `
+  if(preview && dimensoes.length==0) dimensoes = "{Largura}x{Altura} cm "
+
+  let serie = `${ficha.nomeSerie}`
+  if(ficha.nomeSerie.length==0) serie = preview?"{Nome Série}":""
+  let numSerie = `; ${ficha.numSerie}`
+  if(ficha.nomeSerie.length==0 || ficha.numSerie==0) numSerie = preview&&ficha.nomeSerie.length>0?"; {Nº Série}":""
+
+  let line3 = `${ficha.numPag} p.${temProp||preview?" : ":""}${ilustracao}${cor}${dimensoes}${serie.length>0?`(${serie}${numSerie})`:""}`
 
   fichaObj.linha3 = line3
   // fichaTextArray.push(line3)
 
+  if(preview) fichaObj.linhaNota1 = "{Nota 1}"
   if(ficha.nota1.length>0){
     let lineNota = `${ficha.nota1}`
     fichaObj.linhaNota1 = lineNota
     // fichaTextArray.push(lineNota)
   }
+
+  if(preview) fichaObj.linhaNota2 = "{Nota 2}"
   if(ficha.nota2.length>0){
     let lineNota = `${ficha.nota2}`
     fichaObj.linhaNota2 = lineNota
     // fichaTextArray.push(lineNota)
   }
 
-  let line4 = `ISBN ${ficha.isbn}\n`
+  let isbnNumber = `${ficha.isbn}`
+  if(preview && ficha.isbn==0) isbnNumber = "0000000000"
+
+  let line4 = `ISBN ${isbnNumber}\n`
 
   fichaObj.linha4 = line4
   // fichaTextArray.push(line4)
+  
+  let firstAssuntoSecundario = assuntosSecundario[0] || ""
+  if(preview && firstAssuntoSecundario.length==0) firstAssuntoSecundario = "{Pontos de Acesso Secundário de Assunto}"
 
-  let textAssuntosSecundario = `1. ${assuntosSecundario[0]}. `
+  let textAssuntosSecundario = `1. ${firstAssuntoSecundario}. `
   if(assuntosSecundario.length>1){
     for(let x=1;x<assuntosSecundario.length;x++){
       textAssuntosSecundario+=`${x+1}. ${assuntosSecundario[x]}. `
     }
   } 
 
-  let responsabilidadesExtenso = `I. ${convertNameToEntidade(responsabilidades[0])}. `
+  let offset = 0
+  let firstResponsabilidadeExtenso = convertNameToEntidade(responsabilidades[0])
+  if(preview && firstResponsabilidadeExtenso.length==0) {
+    firstResponsabilidadeExtenso = "{Pontos de Acesso Secundário de Responsabilidade}"
+    offset = 1
+  }
+
+  let responsabilidadesExtenso = `I. ${firstResponsabilidadeExtenso}. `
   if(responsabilidades.length>1){
     for(let x=1;x<responsabilidades.length;x++){
       responsabilidadesExtenso +=`${intToRoman(x+1)}. ${convertNameToEntidade(responsabilidades[x])}. `
     }
   }
 
-  let line5EndText = `${intToRoman(responsabilidades.length+1)}. Título. ${intToRoman(responsabilidades.length+2)}. Série.`
+  let line5EndText = `${intToRoman(responsabilidades.length+1+offset)}. Título. ${intToRoman(responsabilidades.length+2+offset)}. Série.`
 
   let line5 = `${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
 
   fichaObj.linha5 = line5
   // fichaTextArray.push(line5)
 
+  if(preview) fichaObj.linhaCDU = "CDU 000"
   if(ficha.cdu.length>0){
     let lineCDU = `CDU ${ficha.cdu}`
     fichaObj.linhaCDU = lineCDU
     // fichaTextArray.push(lineCDU)
   }
 
+  if(preview) fichaObj.linhaCDD = "CDD 000"
   if(ficha.cdd.length>0){
     let lineCDD = `CDD ${ficha.cdd}`
     fichaObj.linhaCDD = lineCDD
     // fichaTextArray.push(lineCDD)
   }
+
+  //Cutter
+  fichaObj.linhaCutter = ficha.cutter
+  if(preview && ficha.cutter.length==0) fichaObj.linhaCutter = "X000x"
+  // if(withCutter) fichaObj.linhaCutter = await getCutter(responsabilidades[0],titulo)
 
   // let fichaText = fichaTextArray.join("\n")
   // exportToTxt(fichaText)
@@ -313,10 +374,11 @@ function intToRoman(integer:number):string {
 }
 
 export function formatText(text:string,type:"name"|"normal"="normal"):string{
-  if(text.length==0) return text
+  if(text?.length==0) return text
 
   if(type=="name"){
     return text.split(" ").map(item=>{
+      if(item.length==0) return item
       return item.split("")[0].toUpperCase() + item.split("").slice(1).join("").toLowerCase()
     }).join(" ")
   } else {
@@ -325,6 +387,7 @@ export function formatText(text:string,type:"name"|"normal"="normal"):string{
 }
 
 function convertNameToEntidade(name:string){
+  if(!name) return ""
   let convertedName = `${name}`
   if(name.split(" ").length>1){
     convertedName = `${name.split(" ").slice(-1)[0]}, ${name.split(" ").slice(0,-1).join(" ")}`
@@ -332,7 +395,50 @@ function convertNameToEntidade(name:string){
   return convertedName
 }
 
-export interface FichaForm{
+async function getCutter(name:string,title:string):Promise<string>{
+  return new Promise((resolve,reject)=>{
+    fetch(`api/tabela-cutter?name=${name}&title=${title}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data?.cutter)
+        resolve(data?.cutter || "")
+      })
+  })
+}
+
+export function getCutter2(name:string,title:string):string {
+  //Coloca sobrenome na frente
+  let convertedName = formatText(name,"name")
+  if(name.split(" ").length>1){
+    convertedName = `${name.split(" ").slice(-1)[0]}, ${name.split(" ").slice(0,-1).join(" ")}`
+  } 
+  let firstLetter = convertedName.split("")[0].toUpperCase()
+  let firstTitleLetter = (title?.split("")[0]||"").toLowerCase()
+  let data = (tabelaCutter as any)[firstLetter]
+  let cutterNumber = 0
+  let x = 0
+  while(cutterNumber==0){
+    let surname = convertedName.split(",")[0]
+    if(x>0) surname = surname.split("").slice(0,-x).join("")
+    let foundKeys = Object.keys(data).filter(key=>{
+      return data[key].includes(surname)
+    })
+    // console.log(foundKeys)
+    cutterNumber = +( foundKeys.length>0?foundKeys[0]: 0)
+    if(foundKeys.length>1 && x==0 &&convertedName.split(",").length>1){
+      let subName = convertedName.slice(0,convertedName.indexOf(" ")+2)+"."
+      // console.log("sub: ",subName)
+      let findSubKey = foundKeys.find(key=>data[key].includes(subName))
+      if(findSubKey) cutterNumber = +findSubKey
+    }
+    // console.log(surname,cutterNumber)
+    if(cutterNumber == 0) x++
+  } 
+  let cutter = `${firstLetter}${cutterNumber}${firstTitleLetter}`
+  return cutter
+}
+
+export interface FichaFormType{
   responsabilidades:string[],
   titulo:string,
   subtitulo:string,
@@ -356,10 +462,12 @@ export interface FichaForm{
   nota2:string,
   assuntosSecundario:string[],
   cdd:string,
-  cdu:string
+  cdu:string,
+  cutter:string
 }
 
 export interface Ficha{
+  linhaCutter?:string
   linha1:string
   linha2:string
   linha3:string

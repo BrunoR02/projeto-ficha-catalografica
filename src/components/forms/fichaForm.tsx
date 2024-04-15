@@ -1,24 +1,28 @@
 'use client'
 import { ChangeEvent, FormEvent, MouseEventHandler, useEffect, useState } from "react"
 import ErrorMessage from "../texts/errorMessage"
-import { FichaForm, criaFichaCatalografica, exportToDocx, exportToPdf, formatText } from "@/utils/Utils"
+import { Ficha, FichaFormType, criaFichaCatalografica, exportToDocx, exportToPdf, formatText, getCutter2 } from "@/utils/Utils"
 import ReactPDF from "@react-pdf/renderer"
 import FichaDocument from "../documents/fichaDocument"
 
-export default function FichaForm(){
+interface PropsType {
+  setFormPreview:(form:Ficha)=>void
+}
+
+export default function FichaForm({setFormPreview}:PropsType){
   const [respName,setRespName] = useState<string>("")
   const [pontoAssunto,setPontoAssunto] = useState<string>("")
-  const [formInput,setFormInput] = useState<FichaForm>({
-    responsabilidades:["Bruno Lucas"],
-    titulo:"A Divina Comédia",
+  const [formInput,setFormInput] = useState<FichaFormType>({
+    responsabilidades:[],
+    titulo:"",
     subtitulo:"",
     tradutor:"",
-    edicao: 1,
+    edicao: 0,
     edicaoObs:"",
-    dataPub:"2024",
-    local:"Aracaju",
-    nomeEditora:"Yuukan",
-    numPag:250,
+    dataPub:"",
+    local:"",
+    nomeEditora:"",
+    numPag:0,
     dimensoes:{
       width:0,
       height:0
@@ -27,12 +31,13 @@ export default function FichaForm(){
     temCor:false,
     nomeSerie:"",
     numSerie:0,
-    isbn:1234567891,
+    isbn:0,
     nota1:"",
     nota2:"",
-    assuntosSecundario:["Religioso","esporte"],
-    cdd:"852",
-    cdu:""
+    assuntosSecundario:[],
+    cdd:"",
+    cdu:"",
+    cutter:""
   })
   const [formIsInvalid,setFormIsInvalid] = useState({
     responsabilidades:false,
@@ -70,12 +75,15 @@ export default function FichaForm(){
     }
   }
 
-  function textFilter(e:React.KeyboardEvent<HTMLInputElement>,type:"normal"|"pontuacao"|"cdd"|"dimensao"="normal"){
+  function textFilter(e:React.KeyboardEvent<HTMLInputElement>,type:"normal"|"pontuacao"|"cdd"|"dimensao"="normal",maxLength=100){
     let reg = new RegExp(`^[a-zA-ZàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ ${type=="pontuacao"?".,:-":""}]+$`)
     if(type=="cdd") reg = /^([0-9.-]+)+$/
     if(type=="dimensao") reg = new RegExp("^[0-9]+(\.[0-9]{1,2})?$")
     // const reg = /^[a-zA-ZàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]+$/
-    if (!(["Delete","Backspace","Tab","ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key) || e.ctrlKey && e.key=="a") && !reg.test(e.key)) {
+    let lastDigit = e.key
+    let inputLength = ((e.target as HTMLInputElement).value + lastDigit).length;
+    console.log(inputLength)
+    if (!(["Delete","Backspace","Tab","ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key) || e.ctrlKey && e.key=="a") && (!reg.test(e.key) ||inputLength>maxLength)) {
       e.preventDefault();
    }
   }
@@ -85,7 +93,7 @@ export default function FichaForm(){
       return
     }
     formIsInvalid["responsabilidades"] = false
-    setFormInput(obj=>({...obj,responsabilidades:[...obj['responsabilidades'],respName]}))
+    setFormInput(obj=>({...obj,responsabilidades:[...obj['responsabilidades'],respName.trim()]}))
     setRespName("")
   }
   
@@ -100,7 +108,7 @@ export default function FichaForm(){
 
   async function handleFormSubmit(e:any){
     console.log("Submit:")
-    console.log(formInput)
+    // console.log(formInput)
 
     // exportToDocx(criaFichaCatalografica(formInput))
     // return
@@ -109,7 +117,7 @@ export default function FichaForm(){
     if(validateForm()){
       console.log("Enviou")
     } else return
-    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={criaFichaCatalografica(formInput)} />).toBlob()
+    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={await criaFichaCatalografica(formInput)} />).toBlob()
     exportToPdf(pdfBuffer,formatText(formInput.titulo))
     
   }
@@ -138,7 +146,7 @@ export default function FichaForm(){
       return false
     }
     
-    if(formInput.dataPub.trim().length!==4){
+    if(formInput.dataPub.trim().length!==4 || (+formInput.dataPub.trim()>new Date().getFullYear()+1)){
       setFormIsInvalid(obj=>({...obj,dataPub:true}))
       return false
     }
@@ -190,8 +198,27 @@ export default function FichaForm(){
         break
       }
     }
-
   },[formIsInvalid])
+
+  useEffect(()=>{
+    setFormPreview(criaFichaCatalografica(formInput,true))
+  },[formInput])
+
+  useEffect(()=>{
+    if(formInput.responsabilidades.length>0){
+      setFormInput(obj=>({...obj,cutter:getCutter2(formInput.responsabilidades[0],formInput["titulo"])}))
+    } else if(formInput.cutter.length>0&&formInput.responsabilidades.length==0){
+      setFormInput(obj=>({...obj,cutter:""}))
+    }
+  },[formInput["responsabilidades"],formInput["titulo"]])
+
+  // useEffect(() => {
+  //   fetch('api/tabela-cutter?name="Date Jorgeo')
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log(data?.cutter)
+  //     })
+  // }, [])
 
   return (
     <form className="flex flex-wrap items-center w-4/12 gap-x-4">
@@ -203,7 +230,8 @@ export default function FichaForm(){
             name="responsabilidades" 
             value={respName} 
             onChange={(e)=>setRespName(e.target.value)}
-            onKeyDown={(e)=>{if(e.key=="Enter") addRespName();return textFilter(e)}}
+            onPaste={(e)=>e.preventDefault()}
+            onKeyDown={(e)=>{if(e.key=="Enter") addRespName();return textFilter(e,"normal",70)}}
             className="block w-full mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6" type="text"/>
           <span onClick={addRespName} 
             className="block text-white rounded-md bg-indigo-500 text-xl ml-2 p-1 px-3 hover:cursor-pointer hover:bg-indigo-600">+</span>
@@ -232,6 +260,7 @@ export default function FichaForm(){
             setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
+          onPaste={(e)=>e.preventDefault()}
           onKeyDown={textFilter}
           value={formInput.titulo}
           name="titulo" 
@@ -243,6 +272,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="subtitulo">Subtítulo</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
+          onPaste={(e)=>e.preventDefault()}
           onKeyDown={textFilter}
           value={formInput.subtitulo}
           name="subtitulo"
@@ -253,7 +283,8 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="tradutor">Tradução</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
-          onKeyDown={textFilter}
+          onPaste={(e)=>e.preventDefault()}
+          onKeyDown={(e)=>textFilter(e,"normal",70)}
           value={formInput.tradutor}
           name="tradutor"
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -278,6 +309,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="edicaoObs">Informações sobre edição</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
+          onPaste={(e)=>e.preventDefault()}
           onKeyDown={textFilter}
           value={formInput.edicaoObs}
           name="edicaoObs" 
@@ -303,7 +335,8 @@ export default function FichaForm(){
             setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
-          onKeyDown={(e)=>textFilter(e,"pontuacao")}
+          onPaste={(e)=>e.preventDefault()}
+          onKeyDown={(e)=>textFilter(e,"pontuacao",50)}
           value={formInput.local}
           name="local" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -317,7 +350,8 @@ export default function FichaForm(){
             setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             (formIsInvalid as any)[e.target.name] = false
           }}
-          onKeyDown={textFilter}
+          onPaste={(e)=>e.preventDefault()}
+          onKeyDown={(e)=>textFilter(e,"normal",50)}
           value={formInput.nomeEditora}
           name="nomeEditora" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -418,7 +452,8 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nomeSerie">Nome da série</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
-          onKeyDown={textFilter}
+          onPaste={(e)=>e.preventDefault()}
+          onKeyDown={(e)=>textFilter(e,"normal",50)}
           value={formInput.nomeSerie}
           name="nomeSerie" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -452,6 +487,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nota1">Nota 1</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
+          onPaste={(e)=>e.preventDefault()}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
           value={formInput.nota1}
           name="nota1" 
@@ -462,6 +498,7 @@ export default function FichaForm(){
         <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="nota2">Nota 2</label>
         <input 
           onChange={(e)=>setFormInput(obj=>({...obj,[e.target.name]:e.target.value}))}
+          onPaste={(e)=>e.preventDefault()}
           onKeyDown={(e)=>textFilter(e,"pontuacao")}
           value={formInput.nota2}
           name="nota2" 
@@ -475,7 +512,8 @@ export default function FichaForm(){
             name="assuntosSecundario" 
             value={pontoAssunto} 
             onChange={(e)=>setPontoAssunto(e.target.value)}
-            onKeyDown={(e)=>{if(e.key=="Enter") addPontoAssunto();return textFilter(e)}}
+            onPaste={(e)=>e.preventDefault()}
+            onKeyDown={(e)=>{if(e.key=="Enter") addPontoAssunto();return textFilter(e,"normal",50)}}
             className="block w-full mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
           <span onClick={addPontoAssunto} 
             className="block text-white rounded-md bg-indigo-500 text-xl ml-2 p-1 px-3 hover:cursor-pointer hover:bg-indigo-600">+</span>
@@ -501,7 +539,7 @@ export default function FichaForm(){
             setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             formIsInvalid["cdd"] = false
           }}
-          onKeyDown={(e)=>textFilter(e,"cdd")}
+          onKeyDown={(e)=>textFilter(e,"cdd",15)}
           value={formInput.cdd}
           name="cdd" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
@@ -516,7 +554,7 @@ export default function FichaForm(){
             setFormInput(obj=>({...obj,[e.target.name]:e.target.value}));
             formIsInvalid["cdd"] = false
           }}
-          onKeyDown={(e)=>textFilter(e,"cdd")}
+          onKeyDown={(e)=>textFilter(e,"cdd",15)}
           value={formInput.cdu}
           name="cdu" 
           className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>

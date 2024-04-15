@@ -13,6 +13,12 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+			keyframes: {
+				fadeIn: {
+					from: { opacity: "0" },
+					to: { opacity: "0.8" },
+				},
+			},
     },
     fontSize: {
       esm: '0.7rem',
