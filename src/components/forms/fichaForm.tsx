@@ -82,7 +82,7 @@ export default function FichaForm({setFormPreview}:PropsType){
     // const reg = /^[a-zA-ZàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]+$/
     let lastDigit = e.key
     let inputLength = ((e.target as HTMLInputElement).value + lastDigit).length;
-    console.log(inputLength)
+    // console.log(inputLength)
     if (!(["Delete","Backspace","Tab","ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key) || e.ctrlKey && e.key=="a") && (!reg.test(e.key) ||inputLength>maxLength)) {
       e.preventDefault();
    }
