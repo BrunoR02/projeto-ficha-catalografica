@@ -1,5 +1,4 @@
 :root {
-  --foreground-rgb: 0, 0, 0;
   --font-garamond: var(--font-garamond);
   --font-merriweather: var(--font-merriweather);
 }
@@ -12,7 +11,7 @@
   width: 100%;
   height: 100%;
   background-image: url("../../public/biblioteca.jpg");
-  background-repeat: false;
+  background-repeat: none;
   background-size: cover;
   filter: blur(4px);
   z-index: -1;
@@ -77,11 +76,9 @@ body {
   0% {
     filter: blur(1px);
   }
-
   50% {
     filter: blur(4px);
   }
-
   100% {
     filter: blur(1px);
   }
