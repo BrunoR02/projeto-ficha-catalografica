@@ -1,9 +1,9 @@
 'use client'
-import { Ficha } from '@/utils/Utils';
+import { IFicha } from '@/interface/Interfaces';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 // Create Document Component
-export default function FichaDocument({ficha,preview=false}:{ficha:Ficha,preview?:boolean}){
+export default function FichaDocument({ficha,preview=false}:{ficha:IFicha,preview?:boolean}){
 
   let fontSize = preview?13:10
   

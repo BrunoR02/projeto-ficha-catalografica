@@ -1,0 +1,79 @@
+@use '../../app/ui/variables';
+
+.container {
+  width: 30%;
+  margin: 0 auto;
+  display: flex;
+  gap: 0 10px;
+  flex-wrap: wrap;
+}
+
+.dimensoes {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+
+  &-label {
+    margin: 0px;
+    margin-top: 5px;
+  }
+
+  &-divisor {
+    font-size: 0.8rem;
+    color: #fff;
+    text-shadow: 1px 1px #222;
+  }
+}
+
+.cdd {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 15px;
+
+  &-divisor {
+    font-size: 1.1rem;
+    color: #fff;
+    text-shadow: 1px 1px #222;
+    margin-top: 20px;
+  }
+}
+
+.flex {
+  &-full {
+    width: 100%;
+  }
+
+  &-2-12 {
+    width: calc((100% / 12 * 2) - 5px);
+  }
+
+  &-3-12 {
+    width: calc((100% / 12 * 3) - 5px);
+  }
+
+  &-4-12 {
+    width: calc((100% / 12 * 4) - 5px);
+  }
+
+  &-5-12 {
+    width: calc((100% / 12 * 5) - 5px);
+  }
+
+  &-6-12 {
+    width: calc((100% / 12 * 6) - 5px);
+  }
+
+  &-8-12 {
+    width: calc((100% / 12 * 8) - 5px);
+  }
+
+  &-9-12 {
+    width: calc((100% / 12 * 9) - 5px);
+  }
+
+  &-10-12 {
+    width: calc((100% / 12 * 10) - 5px);
+  }
+}

@@ -1,0 +1,67 @@
+@use "../../app/ui/variables";
+
+.field {
+  position: relative;
+}
+
+.add {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 0 5px 2px 5px;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: variables.$antique-white;
+  background-color: variables.$golden-ochre;
+  border-radius: variables.$borderRadius;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+
+  &:hover {
+    background-color: variables.$antique-white;
+    color: variables.$golden-ochre;
+  }
+}
+
+.list {
+  display: flex;
+  justify-content: start;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: #fff;
+  background-color: variables.$golden-ochre;
+  border-radius: variables.$borderRadius;
+  cursor: default;
+}
+
+.item-tag {
+  padding: 1px 5px;
+  font-size: 0.75rem;
+  color: variables.$charcoal-black;
+  background-color: variables.$olive-green;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.item-close {
+  font-family: Arial, Helvetica, sans-serif;
+  color: variables.$charcoal-black;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

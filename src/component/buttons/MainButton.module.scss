@@ -1,0 +1,21 @@
+@use '../../app/ui/variables';
+
+.button {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 50px;
+  font-family: 'Merriweather', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: variables.$antique-white;
+  background-color: variables.$golden-ochre;
+  border: none;
+  border-radius: variables.$borderRadius;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    background-color: variables.$antique-white;
+    color: variables.$golden-ochre;
+  }
+}

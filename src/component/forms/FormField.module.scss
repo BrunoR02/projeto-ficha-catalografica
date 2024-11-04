@@ -1,0 +1,67 @@
+@use '../../app/ui/variables';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  margin: 5px 0 5px 0;
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+  color: #fff;
+  text-shadow: 1px 1px #222;
+}
+
+.required {
+  color: variables.$red-error;
+}
+
+.input {
+  margin: 0;
+  padding: 8px;
+  color: #FFF;
+  background-color: #3D3D3D99;
+  border: 2px solid variables.$charcoal-black;
+  outline: none;
+  border-radius: variables.$borderRadius;
+  transition: all 0.3s ease-out;
+
+  &::placeholder {
+    color: #aaa;
+  }
+
+  &:focus {
+    border-color: variables.$golden-ochre;
+    box-shadow: 0 0 4px 1px variables.$golden-ochre;
+  }
+
+  &-error {
+    border-color: variables.$red-error !important;
+    box-shadow: 0 0 4px 1px variables.$red-error !important;
+  }
+}
+
+
+.error {
+  &-message {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: variables.$antique-white;
+  }
+
+  &-tooltip {
+    background-color: variables.$red-error !important;
+    z-index: 5;
+  }
+}
+
+.measure {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  color: #fff;
+  user-select: none;
+}

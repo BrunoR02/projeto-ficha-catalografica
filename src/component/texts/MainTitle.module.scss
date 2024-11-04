@@ -1,0 +1,11 @@
+@use '../../app/ui/variables';
+
+
+.title {
+  margin: 50px auto;
+  text-align: center;
+  font-family: "Merriweather", serif;
+  font-size: 2rem;
+  color: variables.$golden-ochre;
+  text-shadow: 1px 1px variables.$charcoal-black;
+}

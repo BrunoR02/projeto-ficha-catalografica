@@ -1,0 +1,15 @@
+
+.preview {
+  position: fixed;
+  left: 25px;
+  width: 32%;
+  box-sizing: 5px 5px 5px #222;
+  opacity: 0.8;
+  animation: fadeIn ease-in 1s forward;
+  transition: all 0.2 ease-out;
+  font-family: Arial, Helvetica, sans-serif;
+
+  &:hover {
+    opacity: 1;
+  }
+}

@@ -1,9 +1,9 @@
 'use client'
-import { Ficha } from '@/utils/Utils';
+import { IFicha } from '@/interface/Interfaces';
 import { CSSProperties } from 'react';
 
 // Create Document Component
-export default function FichaPreview({ficha}:{ficha:Ficha}){
+export default function FichaPreview({ficha}:{ficha:IFicha}){
   let fontSize = 13
   
   // Create styles
