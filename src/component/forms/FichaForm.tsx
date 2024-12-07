@@ -282,7 +282,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       <div className={styles['flex-4-12']}>
         {/* Data da publicacao */}
         <FormField
-          title="Data da publicação"
+          title="Data pub."
           name="dataPub"
           required
           value={formInput.dataPub}
@@ -324,7 +324,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       <div className={styles['flex-4-12']}>
         {/* Numero de páginas */}
         <FormField
-          title="Núm. de páginas"
+          title="Nº. de páginas"
           name="numPag"
           required
           value={formInput.numPag}
@@ -335,7 +335,6 @@ export default function FichaForm({ setFormPreview }: PropsType) {
             formIsInvalid[e.target.name] = false
           }} />
       </div>
-
       <div className={styles['flex-6-12']}>
         {/* Dimensoes livro */}
         <label className={`${stylesFormField.label} ${styles['dimensoes-label']}`} htmlFor="edicao">Dimensões</label>
@@ -359,7 +358,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           </div>
         </section>
       </div>
-      <div className={styles['flex-4-12']}>
+      <div className={styles['flex-6-12']}>
         {/* Possui ilustracao(sim ou nao) */}
         <RadioFormField
           name="temIlustracao"
@@ -370,7 +369,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
         />
       </div>
       {/* Cor */}
-      <div className={styles['flex-4-12']}>
+      <div className={styles['flex-6-12']}>
         {/* Possui Cor(sim ou nao) */}
         <RadioFormField
           name="temCor"
@@ -393,7 +392,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       <div className={styles['flex-3-12']}>
         {/* Numero de série */}
         <FormField
-          title="Núm. da série"
+          title="Nº. da série"
           name="numSerie"
           value={formInput.numSerie}
           onKeyDownHandler={(e) => InputUtils.numberFilter(e, 3)}
