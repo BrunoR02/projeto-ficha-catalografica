@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 5px;
+  padding-left: 7px;
+  color: #000;
+  background-color: #FFF;
+  border: 1px solid black;
+  border-color: #000;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.text {
+  width: 100%;
+  margin-bottom: 7px;
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+.text2 {
+  width: 100%;
+  font-size: 13px;
+  text-indent: 20px;
+}
+
+.text3 {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 13px;
+  text-indent: 20px;
+}
+
+.text4 {
+  width: 40%;
+  align-self: flex-end;
+  font-size: 13px;
+  text-align: left;
+}
+
+.text5 {
+  width: 1.5cm;
+  margin-top: 33px;
+  margin-right: 5px;
+  font-size: 13px;
+}
