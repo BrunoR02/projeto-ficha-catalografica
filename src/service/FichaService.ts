@@ -15,6 +15,7 @@ export default class FichaService {
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
     let titulo = Utils.formatText(ficha.titulo)
+    let formato = ficha.formato
     let subtitulo = Utils.formatText(ficha.subtitulo)
     let tradutor = `Tradução de ${Utils.formatText(ficha.tradutor, "name")}`
     let local = Utils.formatText(ficha.local, "name")
@@ -23,6 +24,8 @@ export default class FichaService {
     if (isPreview) {
       if (titulo.length == 0)
         titulo = "{Título}"
+      if (formato.length == 0)
+        formato = "{formato}"
       if (subtitulo.length == 0)
         subtitulo = "{Subtítulo}"
       if (local.length == 0)
@@ -59,7 +62,7 @@ export default class FichaService {
     let edicaoObs = `, ${ficha.edicaoObs}.`
     if (ficha.edicao == 0 || ficha.edicaoObs.length == 0) edicaoObs = isPreview && ficha.edicao > 0 ? ", {Info Edição}" : ""
 
-    let line2 = `${titulo}${subtitulo.length > 0 ? `: ${subtitulo}` : ""} / ${nomesExtenso}${tradutor.length > 0 ? ` ; ${tradutor}` : ""}. ${numEdicao.length > 0 ? `${numEdicao}${edicaoObs.length > 0 ? `${edicaoObs}` : ""} ` : ""}${local}: ${nomeEditora}, ${dataPub}.`
+    let line2 = `${titulo}${formato.length > 0 ? ` [${formato}]` : ''}${subtitulo.length > 0 ? `: ${subtitulo}` : ""} / ${nomesExtenso}${tradutor.length > 0 ? ` ; ${tradutor}` : ""}. ${numEdicao.length > 0 ? `${numEdicao}${edicaoObs.length > 0 ? `${edicaoObs}` : ""} ` : ""}${local}: ${nomeEditora}, ${dataPub}.`
 
     fichaObj.linha2 = line2
     // fichaTextArray.push(line2)
@@ -151,9 +154,9 @@ export default class FichaService {
 
     //Cutter
     fichaObj.linhaCutter = ficha.cutter
-    if (isPreview && ficha.cutter.length == 0) 
+    if (isPreview && ficha.cutter.length == 0)
       fichaObj.linhaCutter = "X000x"
-    
+
     // if(withCutter) fichaObj.linhaCutter = await getCutter(responsabilidades[0],titulo)
 
     // let fichaText = fichaTextArray.join("\n")

@@ -14,6 +14,7 @@ import InputUtils from "@/utils/InputUtils"
 import MultiItemFormField from "./MultiItemFormField"
 import RadioFormField from "./RadioFormField"
 import MainButton from "../buttons/MainButton"
+import SelectFormField from "./SelectFormField"
 
 interface PropsType {
   setFormPreview: (form: IFicha) => void
@@ -25,6 +26,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
   const [formInput, setFormInput] = useState<IFichaFormType>({
     responsabilidades: [],
     titulo: "",
+    formato: "",
     subtitulo: "",
     tradutor: "",
     edicao: 0,
@@ -52,6 +54,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
   const [formIsInvalid, setFormIsInvalid] = useState<Record<string, boolean>>({
     responsabilidades: false,
     titulo: false,
+    formato: false,
     dataPub: false,
     local: false,
     nomeEditora: false,
@@ -118,6 +121,11 @@ export default function FichaForm({ setFormPreview }: PropsType) {
 
     if (!StringUtils.isStringValid(formInput.titulo)) {
       setFormIsInvalid(obj => ({ ...obj, titulo: true }))
+      return false
+    }
+
+    if (!StringUtils.isStringValid(formInput.formato)) {
+      setFormIsInvalid(obj => ({ ...obj, formato: true }))
       return false
     }
 
@@ -220,7 +228,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           onChangeHandler={(e) => setRespName(e.target.value)} />
       </div>
 
-      <div className={styles['flex-full']}>
+      <div className={styles['flex-7-12']}>
         {/* Titulo obra */}
         <FormField
           title="Título"
@@ -230,6 +238,25 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           errorMessage={formIsInvalid.titulo ? "Insira um título válido" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
+          onChangeHandler={(e) => {
+            setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }));
+            formIsInvalid[e.target.name] = false
+          }} />
+      </div>
+      <div className={styles['flex-5-12']}>
+        {/* Formato */}
+        <SelectFormField
+          title="Formato"
+          name="formato"
+          required
+          value={formInput.formato}
+          options={[
+            { value: "e-book", label: "E-book" },
+            { value: "manuscrito", label: "Manuscrito" },
+            { value: "fisico", label: "Físico" }
+          ]}
+          initialValue={{ value: "", label: "Selecione um formato" }}
+          errorMessage={formIsInvalid.formato ? "Insira um formato" : ''}
           onChangeHandler={(e) => {
             setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }));
             formIsInvalid[e.target.name] = false

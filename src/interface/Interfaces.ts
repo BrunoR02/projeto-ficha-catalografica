@@ -2,6 +2,7 @@
 export interface IFichaFormType {
   responsabilidades: string[],
   titulo: string,
+  formato: string,
   subtitulo: string,
   tradutor: string,
   edicao: number,
