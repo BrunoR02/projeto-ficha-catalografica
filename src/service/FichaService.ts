@@ -130,7 +130,7 @@ export default class FichaService {
       }
     }
 
-    let indexOrientador = 0
+    let indexOrientador = -1
     
     if(ficha.orientador){
       responsabilidades.push(`${Utils.formatText(ficha.orientador, "name")}`)
