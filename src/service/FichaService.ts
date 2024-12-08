@@ -312,7 +312,9 @@ export default class FichaService {
       }
     }
 
-    let line5EndText = `${Utils.intToRoman(responsabilidades.length + 1 + offset)}. Título. ${Utils.intToRoman(responsabilidades.length + 2 + offset)}. Série.`
+    let serieEndText =  ficha.nomeSerie.length > 0 ? ` ${Utils.intToRoman(responsabilidades.length + 2 + offset)}. Série.` : ''
+
+    let line5EndText = `${Utils.intToRoman(responsabilidades.length + 1 + offset)}. Título.${serieEndText}`
 
     let line5 = `${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
 
