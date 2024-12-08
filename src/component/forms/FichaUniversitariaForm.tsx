@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import ReactPDF from "@react-pdf/renderer"
 import FichaDocument from "../documents/FichaDocument"
-import { IFicha, IFichaFormType } from "../../interface/Interfaces"
+import { ETipoTrabalhoUniversitario, IFicha, IFichaFormType, IFichaUniversityFormType } from "../../interface/Interfaces"
 import StringUtils from "@/utils/StringUtils"
 import Utils from "@/utils/Utils"
 import FileService from "@/service/FileService"
@@ -23,29 +23,22 @@ interface PropsType {
 export default function FichaForm({ setFormPreview }: PropsType) {
   const [respName, setRespName] = useState<string>("")
   const [pontoAssunto, setPontoAssunto] = useState<string>("")
-  const [formInput, setFormInput] = useState<IFichaFormType>({
+  const [formInput, setFormInput] = useState<IFichaUniversityFormType>({
     responsabilidades: [],
     titulo: "",
     formato: "",
     subtitulo: "",
-    tradutor: "",
-    edicao: 0,
-    edicaoObs: "",
+    orientador: "",
+    tipoTrabalho: "" as ETipoTrabalhoUniversitario,
+    universidade: "",
+    departamento: "",
+    curso: "",
     dataPub: "",
     local: "",
-    nomeEditora: "",
     numPag: 0,
-    dimensoes: {
-      width: 0,
-      height: 0
-    },
     temIlustracao: false,
     temCor: false,
-    nomeSerie: "",
-    numSerie: 0,
-    isbn: 0,
-    nota1: "",
-    nota2: "",
+    issn: 0,
     assuntosSecundario: [],
     cdd: "",
     cdu: "",
@@ -55,11 +48,15 @@ export default function FichaForm({ setFormPreview }: PropsType) {
     responsabilidades: false,
     titulo: false,
     formato: false,
+    orientador: false,
+    tipoTrabalho: false,
+    universidade: false,
+    departamento: false,
+    curso: false,
     dataPub: false,
     local: false,
     nomeEditora: false,
     numPag: false,
-    isbn: false,
     assuntosSecundario: false,
     cdd: false
   })
@@ -97,7 +94,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       return
 
     console.log("Enviou")
-    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={await fichaService.criaFichaCatalografica(formInput)} />).toBlob()
+    let pdfBuffer = await ReactPDF.pdf(<FichaDocument ficha={await fichaService.criaFichaCatalograficaUniversitaria(formInput)} />).toBlob()
     fileService.exportToPdf(pdfBuffer, Utils.formatText(formInput.titulo))
   }
 
@@ -129,6 +126,31 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       return false
     }
 
+    if (!StringUtils.isStringValid(formInput.orientador)) {
+      setFormIsInvalid(obj => ({ ...obj, orientador: true }))
+      return false
+    }
+
+    if (!StringUtils.isStringValid(formInput.tipoTrabalho)) {
+      setFormIsInvalid(obj => ({ ...obj, tipoTrabalho: true }))
+      return false
+    }
+
+    if (!StringUtils.isStringValid(formInput.universidade)) {
+      setFormIsInvalid(obj => ({ ...obj, universidade: true }))
+      return false
+    }
+
+    if (!StringUtils.isStringValid(formInput.departamento)) {
+      setFormIsInvalid(obj => ({ ...obj, departamento: true }))
+      return false
+    }
+
+    if (!StringUtils.isStringValid(formInput.curso)) {
+      setFormIsInvalid(obj => ({ ...obj, curso: true }))
+      return false
+    }
+
     if (formInput.dataPub.trim().length !== 4 || (+formInput.dataPub.trim() > new Date().getFullYear() + 1)) {
       setFormIsInvalid(obj => ({ ...obj, dataPub: true }))
       return false
@@ -139,18 +161,8 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       return false
     }
 
-    if (!StringUtils.isStringValid(formInput.nomeEditora)) {
-      setFormIsInvalid(obj => ({ ...obj, nomeEditora: true }))
-      return false
-    }
-
     if (formInput.numPag == 0) {
       setFormIsInvalid(obj => ({ ...obj, numPag: true }))
-      return false
-    }
-    //Caso ISBN nao tiver 10 ou 13 caracteres
-    if (![10, 13].includes((formInput.isbn).toString().split("").length)) {
-      setFormIsInvalid(obj => ({ ...obj, isbn: true }))
       return false
     }
 
@@ -188,7 +200,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
   }, [formIsInvalid])
 
   useEffect(() => {
-    setFormPreview(fichaService.criaFichaCatalografica(formInput, true))
+    setFormPreview(fichaService.criaFichaCatalograficaUniversitaria(formInput, true))
   }, [formInput])
 
   useEffect(() => {
@@ -275,35 +287,69 @@ export default function FichaForm({ setFormPreview }: PropsType) {
       <div className={styles['flex-full']}>
         {/* Nome do tradutor */}
         <FormField
-          title="Tradução"
-          name="tradutor"
-          value={formInput.tradutor}
+          title="Orientador (a)"
+          name="orientador"
+          value={formInput.orientador}
+          required
+          errorMessage={formIsInvalid.tipoTrabalho ? "Insira um nome de orientador (a)" : ''}
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 70)}
           onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
       </div>
-      {/*<div className="mt-3 flex flex-col">
-        {// Responsabilidade secundarias}
-        <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor="responsa2">Responsabilidade Secundária</label>
-        <input className="block mt-1 rounded-md ring-1 ring-outset ring-gray-300 focus-within:ring-2 focus-within:ring-outset focus-within:ring-indigo-600 outline-none border-0 bg-white py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"/>
-      </div>*/}
-      <div className={styles['flex-3-12']}>
-        {/* Numero da edição */}
-        <FormField
-          title="Edição"
-          name="edicao"
-          value={formInput.edicao}
-          onKeyDownHandler={(e) => InputUtils.numberFilter(e, 3)}
-          onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: +e.target.value })) }} />
+      <div className={styles['flex-full']}>
+        {/* Nome da editora */}
+        <SelectFormField
+          title="Tipo de trabalho"
+          name="tipoTrabalho"
+          required
+          value={formInput.tipoTrabalho}
+          options={[
+            {value: ETipoTrabalhoUniversitario.TCC_GRADUACAO, label: "Trabalho de Conclusão de Curso (Graduação)"},
+            {value: ETipoTrabalhoUniversitario.TCC_ESPECIALIZACAO, label: "Trabalho de Conclusão de Curso (Especialização)"},
+            {value: ETipoTrabalhoUniversitario.DISSERTACAO, label: "Dissertação (Mestrado)"},
+            {value: ETipoTrabalhoUniversitario.TESE, label: "Tese (Doutorado)"}
+          ]}
+          errorMessage={formIsInvalid.tipoTrabalho ? "Insira um tipo de trabalho válido" : ''}
+          initialValue={{value: "", label: "Selecione um tipo de trabalho"}}
+          onChangeHandler={(e) => {
+            setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }));
+            formIsInvalid[e.target.name] = false
+          }} />
       </div>
-      <div className={styles['flex-9-12']}>
-        {/* Informações sobre edicao abreviado */}
+      <div className={styles['flex-full']}>
+        {/* subtitulo obra */}
         <FormField
-          title="Informações sobre edição"
-          name="edicaoObs"
-          value={formInput.edicaoObs}
-          onPasteHandler={(e) => e.preventDefault()}
+          title="Universidade"
+          name="universidade"
+          value={formInput.universidade}
+          required
+          errorMessage={formIsInvalid.universidade ? "Insira um nome de universidade" : ''}
           onKeyDownHandler={InputUtils.textFilter}
+          onPasteHandler={(e) => e.preventDefault()}
+          onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
+      </div>
+      <div className={styles['flex-full']}>
+        {/* subtitulo obra */}
+        <FormField
+          title="Departamento"
+          name="departamento"
+          value={formInput.departamento}
+          required
+          errorMessage={formIsInvalid.departamento ? "Insira um nome de departamento" : ''}
+          onKeyDownHandler={InputUtils.textFilter}
+          onPasteHandler={(e) => e.preventDefault()}
+          onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
+      </div>
+      <div className={styles['flex-full']}>
+        {/* subtitulo obra */}
+        <FormField
+          title="Curso"
+          name="curso"
+          value={formInput.curso}
+          required
+          errorMessage={formIsInvalid.curso ? "Insira um nome de curso" : ''}
+          onKeyDownHandler={InputUtils.textFilter}
+          onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
       </div>
       <div className={styles['flex-4-12']}>
@@ -333,21 +379,6 @@ export default function FichaForm({ setFormPreview }: PropsType) {
             formIsInvalid[e.target.name] = false
           }} />
       </div>
-      <div className={styles['flex-full']}>
-        {/* Nome da editora */}
-        <FormField
-          title="Nome da editora"
-          name="nomeEditora"
-          required
-          value={formInput.nomeEditora}
-          errorMessage={formIsInvalid.nomeEditora ? "Insira um nome de editora válido" : ''}
-          onPasteHandler={(e) => e.preventDefault()}
-          onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 50)}
-          onChangeHandler={(e) => {
-            setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }));
-            formIsInvalid[e.target.name] = false
-          }} />
-      </div>
       <div className={styles['flex-4-12']}>
         {/* Numero de páginas */}
         <FormField
@@ -363,27 +394,16 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           }} />
       </div>
       <div className={styles['flex-6-12']}>
-        {/* Dimensoes livro */}
-        <label className={`${stylesFormField.label} ${styles['dimensoes-label']}`} htmlFor="edicao">Dimensões</label>
-        <section className={styles.dimensoes}>
-          <div className={styles['flex-6-12']}>
-            <FormField
-              name="dimW"
-              value={formInput.dimensoes.width}
-              inputMeasure="cm"
-              onKeyDownHandler={(e) => InputUtils.numberFilter(e, 2)}
-              onChangeHandler={(e) => setFormInput(obj => ({ ...obj, dimensoes: { ...obj.dimensoes, width: +e.target.value } }))} />
-          </div>
-          <span className={styles['dimensoes-divisor']}>X</span>
-          <div className={styles['flex-6-12']}>
-            <FormField
-              name="dimH"
-              value={formInput.dimensoes.height}
-              inputMeasure="cm"
-              onKeyDownHandler={(e) => InputUtils.numberFilter(e, 2)}
-              onChangeHandler={(e) => setFormInput(obj => ({ ...obj, dimensoes: { ...obj.dimensoes, height: +e.target.value } }))} />
-          </div>
-        </section>
+        {/* Numero isbn 10 ou 13 */}
+        <FormField
+          title="ISSN"
+          name="issn"
+          value={formInput.issn}
+          onKeyDownHandler={(e) => InputUtils.numberFilter(e, 8)}
+          onChangeHandler={(e) => {
+            setFormInput(obj => ({ ...obj, [e.target.name]: +e.target.value }));
+            formIsInvalid[e.target.name] = false
+          }} />
       </div>
       <div className={styles['flex-6-12']}>
         {/* Possui ilustracao(sim ou nao) */}
@@ -405,59 +425,6 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           value={formInput.temCor ? 'yes' : 'no'}
           onChangeHandler={(e) => setFormInput(obj => ({ ...obj, temCor: e.target.value == "yes" }))}
         />
-      </div>
-      <div className={styles['flex-full']}>
-        {/* Nome da série(se existir do livro) */}
-        <FormField
-          title="Nome da série"
-          name="nomeSerie"
-          value={formInput.nomeSerie}
-          onPasteHandler={(e) => e.preventDefault()}
-          onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 50)}
-          onChangeHandler={(e) => setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }))} />
-      </div>
-      <div className={styles['flex-3-12']}>
-        {/* Numero de série */}
-        <FormField
-          title="Nº. da série"
-          name="numSerie"
-          value={formInput.numSerie}
-          onKeyDownHandler={(e) => InputUtils.numberFilter(e, 3)}
-          onChangeHandler={(e) => setFormInput(obj => ({ ...obj, [e.target.name]: +e.target.value }))} />
-      </div>
-      <div className={styles['flex-6-12']}>
-        {/* Numero isbn 10 ou 13 */}
-        <FormField
-          title="ISBN"
-          name="isbn"
-          required
-          value={formInput.isbn}
-          errorMessage={formIsInvalid.isbn ? "Insira um número de ISBN válido" : ''}
-          onKeyDownHandler={(e) => InputUtils.numberFilter(e, 13)}
-          onChangeHandler={(e) => {
-            setFormInput(obj => ({ ...obj, [e.target.name]: +e.target.value }));
-            formIsInvalid[e.target.name] = false
-          }} />
-      </div>
-      <div className={styles['flex-full']}>
-        {/* Nota sobre livro 1 */}
-        <FormField
-          title="Nota 1"
-          name="nota1"
-          value={formInput.nota1}
-          onPasteHandler={(e) => e.preventDefault()}
-          onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao")}
-          onChangeHandler={(e) => setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }))} />
-      </div>
-      <div className={styles['flex-full']}>
-        {/* Nota sobre livro 2 */}
-        <FormField
-          title="Nota 2"
-          name="nota2"
-          value={formInput.nota2}
-          onPasteHandler={(e) => e.preventDefault()}
-          onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao")}
-          onChangeHandler={(e) => setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }))} />
       </div>
       <div className={styles['flex-full']}>
         {/* Pontos de acesso secundário de assunto */}

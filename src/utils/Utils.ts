@@ -45,8 +45,9 @@ export default class Utils {
   public static convertNameToEntidade(name: string) {
     if (!name) return ""
     let convertedName = `${name}`
-    if (name.split(" ").length > 1) {
-      convertedName = `${name.split(" ").slice(-1)[0]}, ${name.split(" ").slice(0, -1).join(" ")}`
+    let words = name.split(" ").filter(word => word)
+    if (words.length > 1) {
+      convertedName = `${words.slice(-1)[0]}, ${words.slice(0, -1).join(" ")}`
     }
     return convertedName
   }

@@ -1,8 +1,187 @@
-import { IFicha, IFichaDimensions, IFichaFormType } from "../interface/Interfaces"
+import { ETipoTrabalhoUniversitario, IFicha, IFichaDimensions, IFichaFormType, IFichaUniversityFormType } from "../interface/Interfaces"
 import tabelaCutter from "../../tabela-cutter/tabela-cutter.json"
 import Utils from "@/utils/Utils"
 
 export default class FichaService {
+
+  private readonly mapTipoDeTrabalhoUniversitario: Record<ETipoTrabalhoUniversitario, string> = {
+    tcc_graduacao: 'Trabalho de conclusão de curso',
+    tcc_especializacao: 'Trabalho de conclusão de curso',
+    dissertacao: 'Dissertação',
+    tese: 'Tese',
+  }
+
+  private readonly mapTipoConclusaoUniversidade: Record<ETipoTrabalhoUniversitario, string> = {
+    tcc_graduacao: 'graduação',
+    tcc_especializacao: 'especialização',
+    dissertacao: 'mestrado',
+    tese: 'doutorado'
+  }
+
+  criaFichaCatalograficaUniversitaria(ficha: IFichaUniversityFormType, isPreview = false) {
+    const fichaObj: IFicha = {
+      linha1: "",
+      linha2: "",
+      linha3: "",
+      linha4: "",
+      linha5: "",
+    }
+    //Formata textos para criar ficha
+    let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
+    let titulo = Utils.formatText(ficha.titulo)
+    let formato = ficha.formato
+    let subtitulo = Utils.formatText(ficha.subtitulo)
+    let orientador = Utils.formatText(ficha.orientador, "name")
+    let tipoTrabalho = ficha.tipoTrabalho
+    let universidade = Utils.formatText(ficha.universidade, "name")
+    let departamento = Utils.formatText(ficha.departamento, "name")
+    let curso = Utils.formatText(ficha.curso, "name")
+    let local = Utils.formatText(ficha.local, "name")
+    let dataPub = ficha.dataPub
+    if (isPreview) {
+      if (titulo.length == 0)
+        titulo = "{Título}"
+      if (formato.length == 0)
+        formato = "{Formato}"
+      if (subtitulo.length == 0)
+        subtitulo = "{Subtítulo}"
+      if (orientador.length == 0)
+        orientador = "{Orientador}"
+      if (universidade.length == 0)
+        universidade = "{Universidade}"
+      if (departamento.length == 0)
+        departamento = "{Departamento}"
+      if (curso.length == 0)
+        curso = "{Curso}"
+      if (local.length == 0)
+        local = "{Local}"
+      if (dataPub.length == 0)
+        dataPub = "{Data}"
+      if (ficha.cdd.length == 0)
+        fichaObj.linhaCDD = "CDD 000"
+      if (ficha.cdu.length == 0)
+        fichaObj.linhaCDU = "CDU 000"
+    }
+
+    let assuntosSecundario = ficha.assuntosSecundario.map(assunto => Utils.formatText(assunto))
+
+    //Cria texto da ficha para ser convertido em pdf ou word.
+    let fichaTextArray = []
+
+    let firstEntidade = Utils.convertNameToEntidade(responsabilidades[0])
+    if (isPreview && firstEntidade.length == 0) firstEntidade = "{Sobrenome}, {Nome da Principal Responsabilidade}"
+
+    fichaObj.linha1 = `${firstEntidade}.\n`
+    // fichaTextArray.push(line1)
+
+    let nomesExtenso = responsabilidades.join(", ")
+    if (isPreview && responsabilidades.length == 0) nomesExtenso = "{Responsabilidades por Extenso}"
+
+    let line2 = `${titulo}${formato.length > 0 ? ` [${formato}]` : ''}${subtitulo.length > 0 ? `: ${subtitulo}` : ""} / ${nomesExtenso}. ${local}, ${dataPub}.`
+
+    fichaObj.linha2 = line2
+    // fichaTextArray.push(line2)
+
+    //Verifica se tem alguma propriedade do livro explicita
+    let temProp = ficha.temIlustracao || ficha.temCor
+
+    let ilustracao = "il. "
+    if (!ficha.temIlustracao) ilustracao = isPreview ? "{il.} " : ""
+    let cor = "cor. "
+    if (!ficha.temCor) cor = isPreview ? "{cor.} " : ""
+
+    let line3 = `${ficha.numPag} p.${temProp || isPreview ? " : " : ""}${ilustracao}${cor}`
+
+    fichaObj.linha3 = line3
+    // fichaTextArray.push(line3)
+
+    if (ficha.orientador.length > 0 || isPreview)
+      fichaObj.linhaNota1 = `Orientação: ${orientador}`
+
+    let issnNumber = `${ficha.issn}`
+    if (isPreview && ficha.issn == 0)
+      issnNumber = "00000000"
+    
+    if(isPreview || ficha.issn != 0)
+      fichaObj.linhaNota2 = `ISSN ${issnNumber}`
+
+    let tipoTrabalhoText = this.mapTipoDeTrabalhoUniversitario[tipoTrabalho]
+    if(isPreview && !tipoTrabalho)
+      tipoTrabalhoText = `{Trabalho}`
+
+    let tipoConclusaoText = this.mapTipoConclusaoUniversidade[tipoTrabalho]
+    if(isPreview && !tipoConclusaoText)
+      tipoConclusaoText = `{Conclusão}`
+    
+    let conclusaoText = `(${tipoConclusaoText} em ${curso})`
+
+    let line4 = `${tipoTrabalhoText} ${conclusaoText} - ${universidade}, ${departamento}, ${dataPub}.\n`
+
+    fichaObj.linha4 = line4
+    // fichaTextArray.push(line4)
+
+    let firstAssuntoSecundario = assuntosSecundario[0] || ""
+    if (isPreview && firstAssuntoSecundario.length == 0) firstAssuntoSecundario = "{Pontos de Acesso Secundário de Assunto}"
+
+    let textAssuntosSecundario = `1. ${firstAssuntoSecundario}. `
+    if (assuntosSecundario.length > 1) {
+      for (let x = 1; x < assuntosSecundario.length; x++) {
+        textAssuntosSecundario += `${x + 1}. ${assuntosSecundario[x]}. `
+      }
+    }
+
+    let indexOrientador = 0
+    
+    if(ficha.orientador){
+      responsabilidades.push(`${Utils.formatText(ficha.orientador, "name")}`)
+      indexOrientador = responsabilidades.length - 1
+    }
+
+    let offset = 0
+    let firstResponsabilidadeExtenso = Utils.convertNameToEntidade(responsabilidades[0])
+    if (isPreview && !firstResponsabilidadeExtenso) {
+      firstResponsabilidadeExtenso = "{Pontos de Acesso Secundário de Responsabilidade}"
+      offset = 1
+    }
+
+    let responsabilidadesExtenso = `I. ${indexOrientador == 0 ? `${firstResponsabilidadeExtenso}, orient` : firstResponsabilidadeExtenso}. `
+    if (responsabilidades.length > 1) {
+      for (let x = 1; x < responsabilidades.length; x++) {
+        responsabilidadesExtenso += `${Utils.intToRoman(x + 1)}. ${Utils.convertNameToEntidade(responsabilidades[x])}${indexOrientador == x ? ', orient' : ''}. `
+      }
+    }
+
+    let line5EndText = `${Utils.intToRoman(responsabilidades.length + 1 + offset)}. Título.`
+
+    let line5 = `${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
+
+    fichaObj.linha5 = line5
+    // fichaTextArray.push(line5)
+
+    if (ficha.cdu.length > 0) {
+      let lineCDU = `CDU ${ficha.cdu}`
+      fichaObj.linhaCDU = lineCDU
+      // fichaTextArray.push(lineCDU)
+    }
+
+    if (ficha.cdd.length > 0) {
+      let lineCDD = `CDD ${ficha.cdd}`
+      fichaObj.linhaCDD = lineCDD
+      // fichaTextArray.push(lineCDD)
+    }
+
+    //Cutter
+    fichaObj.linhaCutter = ficha.cutter
+    if (isPreview && ficha.cutter.length == 0)
+      fichaObj.linhaCutter = "X000x"
+
+    // if(withCutter) fichaObj.linhaCutter = await getCutter(responsabilidades[0],titulo)
+
+    // let fichaText = fichaTextArray.join("\n")
+    // exportToTxt(fichaText)
+
+    return fichaObj
+  }
 
   criaFichaCatalografica(ficha: IFichaFormType, isPreview = false) {
     const fichaObj: IFicha = {
@@ -15,6 +194,7 @@ export default class FichaService {
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
     let titulo = Utils.formatText(ficha.titulo)
+    let formato = ficha.formato
     let subtitulo = Utils.formatText(ficha.subtitulo)
     let tradutor = `Tradução de ${Utils.formatText(ficha.tradutor, "name")}`
     let local = Utils.formatText(ficha.local, "name")
@@ -23,6 +203,8 @@ export default class FichaService {
     if (isPreview) {
       if (titulo.length == 0)
         titulo = "{Título}"
+      if (formato.length == 0)
+        formato = "{formato}"
       if (subtitulo.length == 0)
         subtitulo = "{Subtítulo}"
       if (local.length == 0)
@@ -59,7 +241,7 @@ export default class FichaService {
     let edicaoObs = `, ${ficha.edicaoObs}.`
     if (ficha.edicao == 0 || ficha.edicaoObs.length == 0) edicaoObs = isPreview && ficha.edicao > 0 ? ", {Info Edição}" : ""
 
-    let line2 = `${titulo}${subtitulo.length > 0 ? `: ${subtitulo}` : ""} / ${nomesExtenso}${tradutor.length > 0 ? ` ; ${tradutor}` : ""}. ${numEdicao.length > 0 ? `${numEdicao}${edicaoObs.length > 0 ? `${edicaoObs}` : ""} ` : ""}${local}: ${nomeEditora}, ${dataPub}.`
+    let line2 = `${titulo}${formato.length > 0 ? ` [${formato}]` : ''}${subtitulo.length > 0 ? `: ${subtitulo}` : ""} / ${nomesExtenso}${tradutor.length > 0 ? ` ; ${tradutor}` : ""}. ${numEdicao.length > 0 ? `${numEdicao}${edicaoObs.length > 0 ? `${edicaoObs}` : ""} ` : ""}${local}: ${nomeEditora}, ${dataPub}.`
 
     fichaObj.linha2 = line2
     // fichaTextArray.push(line2)
@@ -151,9 +333,9 @@ export default class FichaService {
 
     //Cutter
     fichaObj.linhaCutter = ficha.cutter
-    if (isPreview && ficha.cutter.length == 0) 
+    if (isPreview && ficha.cutter.length == 0)
       fichaObj.linhaCutter = "X000x"
-    
+
     // if(withCutter) fichaObj.linhaCutter = await getCutter(responsabilidades[0],titulo)
 
     // let fichaText = fichaTextArray.join("\n")
