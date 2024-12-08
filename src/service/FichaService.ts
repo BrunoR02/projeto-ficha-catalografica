@@ -28,15 +28,15 @@ export default class FichaService {
     }
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
-    let titulo = Utils.formatText(ficha.titulo)
+    let titulo = ficha.titulo
     let formato = ficha.formato
-    let subtitulo = Utils.formatText(ficha.subtitulo)
+    let subtitulo = ficha.subtitulo
     let orientador = Utils.formatText(ficha.orientador, "name")
     let tipoTrabalho = ficha.tipoTrabalho
     let universidade = Utils.formatText(ficha.universidade, "name")
     let departamento = Utils.formatText(ficha.departamento, "name")
     let curso = Utils.formatText(ficha.curso, "name")
-    let local = Utils.formatText(ficha.local, "name")
+    let local = ficha.local
     let dataPub = ficha.dataPub
     if (isPreview) {
       if (titulo.length == 0)
@@ -193,11 +193,11 @@ export default class FichaService {
     }
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
-    let titulo = Utils.formatText(ficha.titulo)
+    let titulo = ficha.titulo
     let formato = ficha.formato
-    let subtitulo = Utils.formatText(ficha.subtitulo)
+    let subtitulo = ficha.subtitulo
     let tradutor = `Tradução de ${Utils.formatText(ficha.tradutor, "name")}`
-    let local = Utils.formatText(ficha.local, "name")
+    let local = ficha.local
     let nomeEditora = Utils.formatText(ficha.nomeEditora, "name")
     let dataPub = ficha.dataPub
     if (isPreview) {

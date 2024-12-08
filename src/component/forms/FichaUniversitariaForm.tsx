@@ -228,6 +228,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="responsabilidades"
           required
           items={formInput.responsabilidades}
+          placeholder="Ex.: Bruno Santos"
           errorMessage={formIsInvalid.responsabilidades ? "Adicione pelo menos 1 responsabilidade" : undefined}
           value={respName}
           highlightPrincipal
@@ -247,6 +248,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="titulo"
           required
           value={formInput.titulo}
+          placeholder="Ex.: Criador de Ficha Catalográfica"
           errorMessage={formIsInvalid.titulo ? "Insira um título válido" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
@@ -280,6 +282,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           title="Subtítulo"
           name="subtitulo"
           value={formInput.subtitulo}
+          placeholder="Ex.: Implementando um sistema eficiente de criação de fichas para bibliotecários"
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
@@ -291,8 +294,9 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="orientador"
           value={formInput.orientador}
           required
+          placeholder="Ex.: Dr. Roberto da Silva Nascimento"
           errorMessage={formIsInvalid.tipoTrabalho ? "Insira um nome de orientador (a)" : ''}
-          onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 70)}
+          onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao", 70)}
           onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
       </div>
@@ -323,6 +327,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="universidade"
           value={formInput.universidade}
           required
+          placeholder="Ex.: Universidade Federal de Sergipe"
           errorMessage={formIsInvalid.universidade ? "Insira um nome de universidade" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
@@ -335,6 +340,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="departamento"
           value={formInput.departamento}
           required
+          placeholder="Ex.: Departamento de Computação"
           errorMessage={formIsInvalid.departamento ? "Insira um nome de departamento" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
@@ -347,6 +353,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="curso"
           value={formInput.curso}
           required
+          placeholder="Ex.: Ciência da Computação"
           errorMessage={formIsInvalid.curso ? "Insira um nome de curso" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
@@ -371,6 +378,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="local"
           required
           value={formInput.local}
+          placeholder="Ex.: Aracaju, SE"
           errorMessage={formIsInvalid.local ? "Insira um local" : ''}
           onPasteHandler={(e) => e.preventDefault()}
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao", 50)}
@@ -433,6 +441,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="assuntosSecundario"
           required
           items={formInput.assuntosSecundario}
+          placeholder="Ex.: Desenvolvimento web"
           errorMessage={formIsInvalid.assuntosSecundario ? "Adicione pelo menos 1 ponto de acesso secundário de assunto" : undefined}
           value={pontoAssunto}
           onAddItemHandler={addPontoAssunto}
