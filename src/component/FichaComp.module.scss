@@ -18,3 +18,28 @@
     display: none;
   }
 }
+
+.ficha-select {
+  &-container {
+    width: 30%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto;
+  }
+
+  &-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FFF;
+  }
+
+  &-field {
+    width: 40%;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: variables.$golden-ochre;
+    border: none;
+    color: #FFF;
+  }
+}

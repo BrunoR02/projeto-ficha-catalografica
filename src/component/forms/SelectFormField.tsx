@@ -10,10 +10,11 @@ interface PropsType {
   initialValue: { value: string, label: string }
   required?: boolean
   errorMessage?: string
+  selectClass?: string
   onChangeHandler: ChangeEventHandler<HTMLSelectElement>
 }
 
-export default function SelectFormField({ title, name, value, initialValue, options, required = false, errorMessage, onChangeHandler }: PropsType) {
+export default function SelectFormField({ title, name, value, initialValue, options, required = false, selectClass, errorMessage, onChangeHandler }: PropsType) {
 
 
   return (
@@ -27,7 +28,7 @@ export default function SelectFormField({ title, name, value, initialValue, opti
         name={name}
         id={name}
         value={value}
-        className={`${styles.input} ${errorMessage ? styles['input-error'] : ''}`}>
+        className={`${styles.input} ${selectClass} ${errorMessage ? styles['input-error'] : ''}`}>
         {[initialValue, ...options].map((option, index) => {
           return <option key={index} value={option.value}>{option.label}</option>
         })}

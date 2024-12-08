@@ -25,6 +25,35 @@ export interface IFichaFormType {
   cutter: string
 }
 
+export interface IFichaUniversityFormType {
+  responsabilidades: string[],
+  titulo: string,
+  formato: string,
+  subtitulo: string,
+  orientador: string,
+  dataPub: string,
+  local: string,
+  numPag: number,
+  temIlustracao: boolean,
+  tipoTrabalho: ETipoTrabalhoUniversitario
+  curso: string,
+  universidade: string,
+  departamento: string
+  temCor: boolean,
+  issn: number,
+  assuntosSecundario: string[],
+  cdd: string,
+  cdu: string,
+  cutter: string
+}
+
+export enum ETipoTrabalhoUniversitario {
+  TCC_GRADUACAO = "tcc_graduacao",
+  TCC_ESPECIALIZACAO = "tcc_especializacao",
+  DISSERTACAO = "dissertacao",
+  TESE = "tese"
+}
+
 export interface IFichaDimensions {
   width: number,
   height: number
