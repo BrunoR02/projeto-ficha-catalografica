@@ -28,15 +28,15 @@ export default class FichaService {
     }
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
-    let titulo = Utils.formatText(ficha.titulo)
+    let titulo = ficha.titulo
     let formato = ficha.formato
-    let subtitulo = Utils.formatText(ficha.subtitulo)
+    let subtitulo = ficha.subtitulo
     let orientador = Utils.formatText(ficha.orientador, "name")
     let tipoTrabalho = ficha.tipoTrabalho
     let universidade = Utils.formatText(ficha.universidade, "name")
     let departamento = Utils.formatText(ficha.departamento, "name")
     let curso = Utils.formatText(ficha.curso, "name")
-    let local = Utils.formatText(ficha.local, "name")
+    let local = ficha.local
     let dataPub = ficha.dataPub
     if (isPreview) {
       if (titulo.length == 0)
@@ -130,7 +130,7 @@ export default class FichaService {
       }
     }
 
-    let indexOrientador = 0
+    let indexOrientador = -1
     
     if(ficha.orientador){
       responsabilidades.push(`${Utils.formatText(ficha.orientador, "name")}`)
@@ -193,11 +193,11 @@ export default class FichaService {
     }
     //Formata textos para criar ficha
     let responsabilidades = ficha.responsabilidades.map(name => Utils.formatText(name, "name"))
-    let titulo = Utils.formatText(ficha.titulo)
+    let titulo = ficha.titulo
     let formato = ficha.formato
-    let subtitulo = Utils.formatText(ficha.subtitulo)
+    let subtitulo = ficha.subtitulo
     let tradutor = `Tradução de ${Utils.formatText(ficha.tradutor, "name")}`
-    let local = Utils.formatText(ficha.local, "name")
+    let local = ficha.local
     let nomeEditora = Utils.formatText(ficha.nomeEditora, "name")
     let dataPub = ficha.dataPub
     if (isPreview) {
@@ -312,7 +312,9 @@ export default class FichaService {
       }
     }
 
-    let line5EndText = `${Utils.intToRoman(responsabilidades.length + 1 + offset)}. Título. ${Utils.intToRoman(responsabilidades.length + 2 + offset)}. Série.`
+    let serieEndText =  ficha.nomeSerie.length > 0 ? ` ${Utils.intToRoman(responsabilidades.length + 2 + offset)}. Série.` : ''
+
+    let line5EndText = `${Utils.intToRoman(responsabilidades.length + 1 + offset)}. Título.${serieEndText}`
 
     let line5 = `${textAssuntosSecundario}${responsabilidadesExtenso}${line5EndText}\n`
 

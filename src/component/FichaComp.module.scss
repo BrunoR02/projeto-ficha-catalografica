@@ -24,8 +24,21 @@
     width: 30%;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     margin: 0 auto;
+
+    @media (max-width: variables.$breakpoint-md) {
+      width: 40%;
+    }
+
+    @media (max-width: variables.$breakpoint-sm) {
+      width: 60%;
+    }
+
+    @media (max-width: variables.$breakpoint-xs) {
+      width: 80%;
+    }
   }
 
   &-label {

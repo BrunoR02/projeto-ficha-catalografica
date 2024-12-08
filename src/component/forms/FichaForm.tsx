@@ -219,6 +219,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           errorMessage={formIsInvalid.responsabilidades ? "Adicione pelo menos 1 responsabilidade" : undefined}
           value={respName}
           highlightPrincipal
+          placeholder="Ex.: Napoleon Hill"
           onAddItemHandler={addRespName}
           onRemoveItemHandler={(index: number) =>
             setFormInput(obj => ({ ...obj, responsabilidades: obj['responsabilidades'].filter((item, i) => i !== index) }))
@@ -238,6 +239,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           errorMessage={formIsInvalid.titulo ? "Insira um título válido" : ''}
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
+          placeholder="Ex.: Mais esperto que o Diabo"
           onChangeHandler={(e) => {
             setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }));
             formIsInvalid[e.target.name] = false
@@ -268,6 +270,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           title="Subtítulo"
           name="subtitulo"
           value={formInput.subtitulo}
+          placeholder="Ex.: O mistério revelado da liberdade e do sucesso"
           onKeyDownHandler={InputUtils.textFilter}
           onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
@@ -278,6 +281,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           title="Tradução"
           name="tradutor"
           value={formInput.tradutor}
+          placeholder="Ex.: Jorge Nascimento Silva"
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 70)}
           onPasteHandler={(e) => e.preventDefault()}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
@@ -302,6 +306,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           title="Informações sobre edição"
           name="edicaoObs"
           value={formInput.edicaoObs}
+          placeholder="Ex.: Edição padrão"
           onPasteHandler={(e) => e.preventDefault()}
           onKeyDownHandler={InputUtils.textFilter}
           onChangeHandler={(e) => { setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value })) }} />
@@ -326,6 +331,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           required
           value={formInput.local}
           errorMessage={formIsInvalid.local ? "Insira um local" : ''}
+          placeholder="Ex.: Aracaju, SE"
           onPasteHandler={(e) => e.preventDefault()}
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao", 50)}
           onChangeHandler={(e) => {
@@ -340,6 +346,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="nomeEditora"
           required
           value={formInput.nomeEditora}
+          placeholder="Ex.: Yuukan Livros"
           errorMessage={formIsInvalid.nomeEditora ? "Insira um nome de editora válido" : ''}
           onPasteHandler={(e) => e.preventDefault()}
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "normal", 50)}
@@ -445,6 +452,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           title="Nota 1"
           name="nota1"
           value={formInput.nota1}
+          placeholder="Ex.: Capa dura"
           onPasteHandler={(e) => e.preventDefault()}
           onKeyDownHandler={(e) => InputUtils.textFilter(e, "pontuacao")}
           onChangeHandler={(e) => setFormInput(obj => ({ ...obj, [e.target.name]: e.target.value }))} />
@@ -466,6 +474,7 @@ export default function FichaForm({ setFormPreview }: PropsType) {
           name="assuntosSecundario"
           required
           items={formInput.assuntosSecundario}
+          placeholder="Ex.: Desenvolvimento pessoal"
           errorMessage={formIsInvalid.assuntosSecundario ? "Adicione pelo menos 1 ponto de acesso secundário de assunto" : undefined}
           value={pontoAssunto}
           onAddItemHandler={addPontoAssunto}
